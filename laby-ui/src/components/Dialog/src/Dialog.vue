@@ -133,24 +133,49 @@ function closedHandler() {
 
   .#{$elNamespace}-dialog {
     margin: 0 !important;
+    background: var(--ios-bg-secondary, #ffffff) !important;
+    backdrop-filter: none !important;
 
     &__header {
       height: 54px;
       padding: 0;
       margin-right: 0 !important;
       border-bottom: 1px solid var(--el-border-color);
+      background: var(--ios-bg-secondary, #ffffff) !important;
     }
 
     &__body {
       padding: 15px !important;
+      background: var(--ios-bg-secondary, #ffffff) !important;
     }
 
     &__footer {
       border-top: 1px solid var(--el-border-color);
+      background: var(--ios-bg-secondary, #ffffff) !important;
     }
 
     &__headerbtn {
       top: 0;
+    }
+  }
+}
+
+.dark {
+  .com-dialog {
+    .#{$elNamespace}-dialog {
+      background: var(--ios-bg-secondary, #1c1c1e) !important;
+
+      &__header {
+        background: var(--ios-bg-secondary, #1c1c1e) !important;
+      }
+
+      &__body {
+        background: var(--ios-bg-secondary, #1c1c1e) !important;
+      }
+
+      &__footer {
+        background: var(--ios-bg-secondary, #1c1c1e) !important;
+      }
     }
   }
 }
