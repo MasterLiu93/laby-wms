@@ -467,7 +467,7 @@
     th {
       background: transparent;
       color: var(--ios-text-primary, #000000) !important;
-      font-weight: 600;
+      font-weight: 600 !important;
       font-size: 14px;
       border-bottom-color: rgba(142, 142, 147, 0.25) !important;
       transition: background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
@@ -703,18 +703,18 @@
   font-weight: 400;
   transition: all 0.2s;
 
-  &:hover {
+    &:hover {
     background: rgba(142, 142, 147, 0.15) !important;
     color: var(--ios-color-primary, #007aff) !important;
     font-weight: 500;
-  }
+    }
 
-  &.is-active {
+    &.is-active {
     background: rgba(0, 122, 255, 0.15) !important;
     color: var(--ios-color-primary, #007aff) !important;
     font-weight: 600;
+    }
   }
-}
 
 .el-sub-menu__title {
   color: var(--ios-text-primary, #000000) !important;
@@ -819,7 +819,7 @@
     &__label {
       font-family: monospace;
       color: var(--ios-text-primary, #000000) !important;
-      font-weight: 500;
+      font-weight: 600 !important;
       font-size: 14px;
       // 确保 label 换行时垂直居中
       display: flex;
@@ -935,6 +935,11 @@
 
         &:last-child {
           margin-right: 0;
+        }
+
+        // 检索表单的 label 加粗
+        &__label {
+          font-weight: 600 !important;
         }
       }
     }
@@ -1155,7 +1160,7 @@
     &__header {
       color: var(--ios-text-primary, #ffffff) !important;
       border-bottom-color: rgba(142, 142, 147, 0.3);
-    }
+  }
 
     &__body {
       color: var(--ios-text-primary, #ffffff) !important;
@@ -1172,6 +1177,7 @@
 
       th {
         color: var(--ios-text-primary, #ffffff) !important;
+        font-weight: 600 !important;
         border-bottom-color: rgba(142, 142, 147, 0.3) !important;
 
         &:hover {
@@ -1306,6 +1312,7 @@
     &-item {
       &__label {
         color: var(--ios-text-primary, #ffffff) !important;
+        font-weight: 600 !important;
       }
 
       &__error {
