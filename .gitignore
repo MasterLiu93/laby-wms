@@ -53,6 +53,3 @@ application-my.yaml
 /laby-ui-app/unpackage/
 **/.DS_Store
 
-# SQL 文件（包含示例数据，不推送到仓库）
-sql/mysql/*.sql
-!sql/mysql/*.template.sql
