@@ -1,0 +1,101 @@
+:root {
+  /* ==================== iOS 风格渐变色配置 ==================== */
+  --gradient-primary: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+  --gradient-success: linear-gradient(135deg, #34c759 0%, #30b350 100%);
+  --gradient-warning: linear-gradient(135deg, #ff9500 0%, #e68600 100%);
+  --gradient-danger: linear-gradient(135deg, #ff3b30 0%, #e6342a 100%);
+  --gradient-purple: linear-gradient(135deg, #af52de 0%, #9747bf 100%);
+  --gradient-pink: linear-gradient(135deg, #ff2d55 0%, #e6294c 100%);
+  --gradient-blue: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+  --gradient-bg: linear-gradient(135deg, #f2f2f7 0%, #e5e5ea 100%);
+
+  /* ==================== iOS 风格登录页配置 ==================== */
+  --login-bg-color: linear-gradient(135deg, #f2f2f7 0%, #e5e5ea 100%);
+
+  /* ==================== 左侧菜单配置 ==================== */
+  --left-menu-max-width: 280px;
+  --left-menu-min-width: 64px;
+  --left-menu-bg-color: #1e293b;
+  --left-menu-bg-light-color: #334155;
+  --left-menu-bg-active-color: var(--el-color-primary);
+  --left-menu-text-color: #cbd5e1;
+  --left-menu-text-active-color: #fff;
+  --left-menu-collapse-bg-active-color: var(--el-color-primary);
+
+  /* ==================== Logo配置 ==================== */
+  --logo-height: 50px;
+  --logo-title-text-color: #fff;
+
+  /* ==================== Header配置 ==================== */
+  --top-header-bg-color: '#fff';
+  --top-header-text-color: 'inherit';
+  --top-header-hover-color: #f6f6f6;
+  --top-tool-height: var(--logo-height);
+  --top-tool-p-x: 0;
+  --tags-view-height: 35px;
+
+  /* ==================== Tab菜单配置 ==================== */
+  --tab-menu-max-width: 80px;
+  --tab-menu-min-width: 30px;
+  --tab-menu-collapse-height: 36px;
+
+  /* ==================== 内容区配置 ==================== */
+  --app-content-padding: 20px;
+  --app-content-bg-color: #f5f7fa;
+  --app-footer-height: 50px;
+
+  /* ==================== 动画配置 ==================== */
+  --transition-time-02: 0.2s;
+  --transition-time-03: 0.3s;
+  
+  /* ==================== iOS 风格卡片配置 ==================== */
+  --card-border-radius: 16px;
+  --card-shadow: 0 2px 16px rgba(0, 0, 0, 0.04);
+  --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --card-bg-color: #ffffff;
+  
+  /* ==================== 首页配置 ==================== */
+  --home-greeting-bg: linear-gradient(135deg, #5eb3f6 0%, #4a9ff5 100%);
+  --home-stat-card-bg: #ffffff;
+  --home-quick-card-bg: #f8f9fa;
+  --home-chart-bg: #ffffff;
+}
+
+.dark {
+  /* ==================== iOS 暗色渐变色配置 ==================== */
+  --gradient-bg: linear-gradient(135deg, #000000 0%, #1c1c1e 100%);
+  --login-bg-color: linear-gradient(135deg, #000000 0%, #1c1c1e 100%);
+  
+  /* ==================== iOS 暗色内容区配置 ==================== */
+  --app-content-bg-color: #000000;
+  
+  /* ==================== iOS 暗色左侧菜单配置 ==================== */
+  --left-menu-bg-color: #000000;
+  --left-menu-bg-light-color: #1c1c1e;
+  --left-menu-text-color: #aeaeb2;
+  
+  /* ==================== iOS 暗色卡片配置 ==================== */
+  --card-shadow: 0 2px 16px rgba(0, 0, 0, 0.3);
+  --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --card-bg-color: #1c1c1e;
+  
+  /* ==================== 首页暗色配置 ==================== */
+  --home-greeting-bg: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+  --home-stat-card-bg: #1c1c1e;
+  --home-quick-card-bg: #2c2c2e;
+  --home-chart-bg: #1c1c1e;
+}
+
+html,
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+:after,
+:before {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}

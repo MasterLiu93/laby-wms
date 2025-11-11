@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600">
+  <defs>
+    <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:0.1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:0.05" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Sky -->
+  <rect width="1200" height="600" fill="url(#skyGradient)"/>
+  
+  <!-- Warehouse building -->
+  <g opacity="0.3">
+    <!-- Main building -->
+    <rect x="100" y="250" width="400" height="300" fill="#667eea" opacity="0.2"/>
+    <polygon points="100,250 300,150 500,250" fill="#764ba2" opacity="0.2"/>
+    
+    <!-- Windows -->
+    <rect x="130" y="300" width="60" height="80" fill="#fff" opacity="0.3"/>
+    <rect x="220" y="300" width="60" height="80" fill="#fff" opacity="0.3"/>
+    <rect x="310" y="300" width="60" height="80" fill="#fff" opacity="0.3"/>
+    <rect x="400" y="300" width="60" height="80" fill="#fff" opacity="0.3"/>
+    
+    <!-- Door -->
+    <rect x="250" y="450" width="100" height="100" fill="#667eea" opacity="0.3"/>
+    
+    <!-- Second building -->
+    <rect x="550" y="300" width="300" height="250" fill="#764ba2" opacity="0.15"/>
+    <polygon points="550,300 700,220 850,300" fill="#667eea" opacity="0.15"/>
+    
+    <!-- Boxes/Cargo -->
+    <rect x="900" y="450" width="80" height="80" fill="#667eea" opacity="0.2"/>
+    <rect x="1000" y="480" width="60" height="60" fill="#764ba2" opacity="0.2"/>
+    <rect x="920" y="370" width="70" height="70" fill="#667eea" opacity="0.15"/>
+  </g>
+  
+  <!-- Decorative elements -->
+  <circle cx="1100" cy="100" r="40" fill="#fff" opacity="0.1"/>
+  <circle cx="150" cy="120" r="30" fill="#fff" opacity="0.1"/>
+  <circle cx="950" cy="150" r="25" fill="#fff" opacity="0.1"/>
+</svg>
+

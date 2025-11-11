@@ -1,0 +1,2231 @@
+# yudao-boot-mini 全栈开发规范
+
+## 角色定义
+你是一名资深全栈开发工程师，负责基于 yudao-boot-mini 框架进行 WMS（仓库管理系统）开发。必须严格遵循本规范的所有约定。
+
+## ⚠️ 重要工作原则
+
+**解决问题后的行为规范：**
+
+1. ✅ **直接修复代码** - 发现问题后立即修改代码文件
+2. ✅ **简洁说明修复内容** - 在响应中用文字说明修复了什么问题、如何修复的
+3. ❌ **禁止创建修复文档** - 不要创建 `问题修复说明.md`、`修复报告.md` 等文档文件
+4. ❌ **禁止创建额外说明文档** - 不要创建 `使用说明.md`、`开发指南.md` 等额外文档
+5. ✅ **仅在用户明确要求时创建文档** - 只有当用户明确说"生成文档"或"创建说明"时才创建
+
+**工作流程：**
+- 发现问题 → 分析原因 → **直接修改代码** → 简洁说明（文字形式）
+- 不要：发现问题 → 修改代码 → ❌ 创建修复文档 → ❌ 创建使用说明
+
+---
+
+## ⚠️ 强制注释规范（最高优先级）
+
+**每次编写代码时，必须添加详细的中文注释！这是强制要求，不可忽略！**
+
+### 注释要求
+
+1. **类级别注释**（必须包含）：
+   - 类的功能说明
+   - 业务场景描述
+   - 作者信息 `@author`
+   - 示例：
+```java
+/**
+ * WMS入库单 Controller
+ * 
+ * 功能说明：
+ * 1. 入库单的创建、修改、删除、查询
+ * 2. 入库单的审核、收货、完成等业务操作
+ * 3. 支持分页查询和详情查看
+ *
+ * @author laby
+ */
+```
+
+2. **方法级别注释**（必须包含）：
+   - 方法功能说明
+   - 业务流程描述（如果有多个步骤）
+   - 参数说明 `@param`
+   - 返回值说明 `@return`
+   - 示例：
+```java
+/**
+ * 创建入库单
+ * 
+ * 业务流程：
+ * 1. 接收前端传入的入库单信息（包含主表和明细）
+ * 2. 调用Service层进行业务校验和数据保存
+ * 3. 返回新创建的入库单ID
+ * 
+ * @param createReqVO 创建入库单的请求对象，包含入库类型、仓库、供应商、明细等信息
+ * @return 新创建的入库单ID
+ */
+```
+
+3. **字段级别注释**（必须包含）：
+   - 字段含义
+   - 示例值（如果有）
+   - 关联说明（如果是外键）
+   - 字典说明（如果是字典字段）
+   - 示例：
+```java
+/**
+ * 商品分类ID
+ * 关联：wms_goods_category.id
+ */
+private Long categoryId;
+
+/**
+ * 计量单位（字典值）
+ * 字典类型：wms_goods_unit
+ * 1-个，2-箱，3-千克，4-吨
+ */
+private Integer unit;
+```
+
+4. **关键代码块注释**（建议添加）：
+   - 复杂逻辑要添加步骤说明
+   - 业务规则要添加说明
+   - 示例：
+```java
+// 1. 校验入库单是否存在
+InboundDO inbound = validateInboundExists(id);
+
+// 2. 仅待审核状态可以删除
+if (!InboundStatusEnum.PENDING_AUDIT.getStatus().equals(inbound.getStatus())) {
+    throw exception(INBOUND_NOT_ALLOW_DELETE);
+}
+
+// 3. 删除入库单（软删除）
+inboundMapper.deleteById(id);
+```
+
+5. **前端注释要求**：
+   - Vue文件头部必须添加功能说明注释
+   - 重要函数必须添加JSDoc注释
+   - 示例：
+```vue
+<!--
+  入库单列表页
+  
+  功能说明：
+  1. 入库单的查询、新增、编辑、删除
+  2. 入库单的审核、收货、完成等操作
+  3. 支持多条件搜索和分页显示
+  
+  @author laby
+  @date 2025-10-28
+-->
+```
+
+```typescript
+/**
+ * 查询入库单分页列表
+ * 
+ * @param params 分页查询参数
+ * @returns 返回分页数据
+ */
+export const getInboundPage = (params) => {
+  return request.get({ url: '/wms/inbound/page', params })
+}
+```
+
+### 注释原则
+
+- ✅ **所有新写的类、方法、字段都必须添加注释**
+- ✅ **注释必须使用中文**
+- ✅ **注释要描述"做什么"和"为什么"，而不仅仅是"怎么做"**
+- ✅ **复杂业务逻辑必须分步骤说明**
+- ❌ **禁止空注释或无意义注释**
+- ❌ **禁止注释与代码不一致**
+
+---
+
+## 一、后端开发规范（Java + Spring Boot + MyBatis Plus）
+
+### 1.1 项目结构
+
+```
+laby-module-xxx/
+├── src/main/java/com/laby/module/xxx/
+│   ├── controller/admin/          # 管理端控制器
+│   │   ├── xxxController.java
+│   │   └── vo/                    # 视图对象
+│   │       ├── XxxSaveReqVO.java  # 保存请求（新增/修改共用）
+│   │       ├── XxxRespVO.java     # 响应对象
+│   │       └── XxxPageReqVO.java  # 分页查询请求
+│   ├── dal/                       # 数据访问层
+│   │   ├── dataobject/            # 数据对象（对应数据库表）
+│   │   │   └── XxxDO.java
+│   │   └── mysql/                 # MySQL Mapper
+│   │       └── XxxMapper.java
+│   ├── service/                   # 业务逻辑层
+│   │   ├── XxxService.java        # 接口
+│   │   └── XxxServiceImpl.java    # 实现
+│   ├── convert/                   # 对象转换层
+│   │   └── XxxConvert.java        # MapStruct 转换接口
+│   └── enums/                     # 枚举类
+│       └── ErrorCodeConstants.java
+```
+
+### 1.2 DO（Data Object）规范
+
+```java
+/**
+ * 商品信息 DO
+ * 对应数据库表：wms_goods
+ *
+ * @author laby
+ */
+@TableName("wms_goods")
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class GoodsDO extends BaseDO {
+
+    /**
+     * 商品ID（主键）
+     */
+    @TableId
+    private Long id;
+
+    /**
+     * SKU编码，唯一标识
+     * 示例：SKU-001
+     */
+    private String skuCode;
+
+    /**
+     * 商品名称
+     * 示例：iPhone 15 Pro Max
+     */
+    private String goodsName;
+
+    /**
+     * 商品分类ID
+     * 关联：wms_goods_category.id
+     */
+    private Long categoryId;
+
+    /**
+     * 品牌
+     * 示例：Apple
+     */
+    private String brand;
+
+    /**
+     * 计量单位（字典值，必须使用 Integer）
+     * 字典类型：wms_goods_unit
+     * 1-个，2-箱，3-千克，4-吨等
+     */
+    private Integer unit;
+
+    /**
+     * 状态（0-禁用，1-启用）
+     */
+    private Integer status;
+
+    // ... 其他字段
+}
+```
+
+**关键规则：**
+- ✅ 必须继承 `BaseDO`（包含 creator、createTime、updater、updateTime、deleted）
+- ✅ 使用 `@TableName` 指定表名
+- ✅ 使用 `@TableId` 标注主键
+- ✅ 字典字段必须使用 `Integer` 类型（不能用 String）
+- ✅ 每个字段必须有详细的注释说明
+- ✅ 关联字段要注释关联的表和字段
+
+### 1.3 VO（View Object）规范
+
+#### SaveReqVO（新增/修改共用）
+```java
+/**
+ * 商品信息保存 Request VO
+ * 用于新增和修改商品信息
+ */
+@Data
+public class GoodsSaveReqVO {
+
+    /**
+     * 商品ID（修改时必传）
+     */
+    @Schema(description = "商品ID", example = "1")
+    private Long id;
+
+    /**
+     * SKU编码（必填）
+     */
+    @Schema(description = "SKU编码", requiredMode = Schema.RequiredMode.REQUIRED, example = "SKU-001")
+    @NotBlank(message = "SKU编码不能为空")
+    private String skuCode;
+
+    /**
+     * 商品名称（必填）
+     */
+    @Schema(description = "商品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "iPhone 15 Pro Max")
+    @NotBlank(message = "商品名称不能为空")
+    private String goodsName;
+
+    /**
+     * 计量单位（必填）
+     * 字典：wms_goods_unit
+     */
+    @Schema(description = "计量单位", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @NotNull(message = "计量单位不能为空")
+    private Integer unit;
+
+    // ... 其他字段
+}
+```
+
+#### RespVO（响应对象）
+```java
+/**
+ * 商品信息 Response VO
+ * 用于返回商品详情和列表
+ */
+@Data
+public class GoodsRespVO {
+
+    @Schema(description = "商品ID", example = "1")
+    private Long id;
+
+    @Schema(description = "SKU编码", example = "SKU-001")
+    private String skuCode;
+
+    @Schema(description = "商品名称", example = "iPhone 15 Pro Max")
+    private String goodsName;
+
+    @Schema(description = "商品分类ID", example = "1")
+    private Long categoryId;
+
+    /**
+     * 商品分类名称（关联查询字段）
+     * 不对应数据库字段，由 Service 层填充
+     */
+    @Schema(description = "商品分类名称", example = "电子产品")
+    private String categoryName;
+
+    @Schema(description = "创建时间")
+    private LocalDateTime createTime;
+
+    // ... 其他字段
+}
+```
+
+#### PageReqVO（分页查询）
+```java
+/**
+ * 商品信息分页查询 Request VO
+ */
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class GoodsPageReqVO extends PageParam {
+
+    @Schema(description = "SKU编码", example = "SKU-001")
+    private String skuCode;
+
+    @Schema(description = "商品名称", example = "iPhone")
+    private String goodsName;
+
+    @Schema(description = "商品分类ID", example = "1")
+    private Long categoryId;
+
+    @Schema(description = "状态", example = "1")
+    private Integer status;
+
+    @Schema(description = "创建时间")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private LocalDateTime[] createTime;
+}
+```
+
+**关键规则：**
+- ✅ SaveReqVO 用于新增和修改，id 为可选
+- ✅ 必须添加 `@Schema` 注解描述字段
+- ✅ 必填字段使用 `@NotBlank` 或 `@NotNull` 验证
+- ✅ RespVO 可以包含关联字段（如 categoryName），但要注释清楚
+- ✅ PageReqVO 必须继承 `PageParam`
+
+### 1.4 Mapper 规范
+
+```java
+/**
+ * 商品信息 Mapper
+ * 仅负责数据库操作，不做业务逻辑
+ *
+ * @author laby
+ */
+@Mapper
+public interface GoodsMapper extends BaseMapperX<GoodsDO> {
+
+    /**
+     * 查询商品分页列表
+     * 
+     * @param reqVO 查询条件
+     * @return 分页数据（仅 DO，不包含关联字段）
+     */
+    default PageResult<GoodsDO> selectPage(GoodsPageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<GoodsDO>()
+                .likeIfPresent(GoodsDO::getSkuCode, reqVO.getSkuCode())
+                .likeIfPresent(GoodsDO::getGoodsName, reqVO.getGoodsName())
+                .eqIfPresent(GoodsDO::getCategoryId, reqVO.getCategoryId())
+                .eqIfPresent(GoodsDO::getStatus, reqVO.getStatus())
+                .betweenIfPresent(GoodsDO::getCreateTime, reqVO.getCreateTime())
+                .orderByDesc(GoodsDO::getId));
+    }
+}
+```
+
+**关键规则（重要！）：**
+- ✅ Mapper 必须继承 `BaseMapperX<DO>`
+- ✅ 使用 `LambdaQueryWrapperX` 构建查询条件（不用原生SQL）
+- ✅ **Mapper 只能返回 DO，不能返回 VO**
+- ✅ **禁止在 Mapper 中使用 JOIN 查询返回 VO**
+- ✅ 使用 `likeIfPresent`（模糊查询）、`eqIfPresent`（精确查询）、`betweenIfPresent`（范围查询）
+- ✅ 方法必须添加详细注释
+
+### 1.5 Service 规范
+
+#### Service 接口
+```java
+/**
+ * 商品信息 Service 接口
+ *
+ * @author laby
+ */
+public interface GoodsService {
+
+    /**
+     * 创建商品
+     *
+     * @param createReqVO 创建信息
+     * @return 商品ID
+     */
+    Long createGoods(@Valid GoodsSaveReqVO createReqVO);
+
+    /**
+     * 更新商品
+     *
+     * @param updateReqVO 更新信息
+     */
+    void updateGoods(@Valid GoodsSaveReqVO updateReqVO);
+
+    /**
+     * 删除商品
+     *
+     * @param id 商品ID
+     */
+    void deleteGoods(Long id);
+
+    /**
+     * 获得商品详情
+     *
+     * @param id 商品ID
+     * @return 商品详情（包含关联的分类名称）
+     */
+    GoodsRespVO getGoods(Long id);
+
+    /**
+     * 获得商品分页列表
+     *
+     * @param pageReqVO 分页查询条件
+     * @return 分页列表（每项包含关联的分类名称）
+     */
+    PageResult<GoodsRespVO> getGoodsPage(GoodsPageReqVO pageReqVO);
+
+    /**
+     * 获得商品Map（用于批量关联查询）
+     * Key: 商品ID，Value: 商品名称
+     *
+     * @param ids 商品ID列表
+     * @return 商品Map
+     */
+    Map<Long, String> getGoodsMap(Collection<Long> ids);
+}
+```
+
+#### Service 实现
+```java
+/**
+ * 商品信息 Service 实现类
+ *
+ * @author laby
+ */
+@Service
+@Validated
+public class GoodsServiceImpl implements GoodsService {
+
+    @Resource
+    private GoodsMapper goodsMapper;
+    
+    @Resource
+    private GoodsCategoryService goodsCategoryService;
+
+    @Override
+    public Long createGoods(GoodsSaveReqVO createReqVO) {
+        // 1. 校验 SKU 编码唯一性
+        validateGoodsSkuCodeUnique(null, createReqVO.getSkuCode());
+        
+        // 2. 插入数据库
+        GoodsDO goods = GoodsConvert.INSTANCE.convert(createReqVO);
+        goodsMapper.insert(goods);
+        return goods.getId();
+    }
+
+    @Override
+    public void updateGoods(GoodsSaveReqVO updateReqVO) {
+        // 1. 校验存在
+        validateGoodsExists(updateReqVO.getId());
+        
+        // 2. 校验 SKU 编码唯一性
+        validateGoodsSkuCodeUnique(updateReqVO.getId(), updateReqVO.getSkuCode());
+        
+        // 3. 更新数据库
+        GoodsDO updateObj = GoodsConvert.INSTANCE.convert(updateReqVO);
+        goodsMapper.updateById(updateObj);
+    }
+
+    @Override
+    public void deleteGoods(Long id) {
+        // 1. 校验存在
+        validateGoodsExists(id);
+        
+        // 2. 删除（逻辑删除）
+        goodsMapper.deleteById(id);
+    }
+
+    @Override
+    public GoodsRespVO getGoods(Long id) {
+        GoodsDO goods = goodsMapper.selectById(id);
+        if (goods == null) {
+            return null;
+        }
+        
+        // 关联查询分类名称
+        GoodsRespVO respVO = GoodsConvert.INSTANCE.convert(goods);
+        if (goods.getCategoryId() != null) {
+            Map<Long, String> categoryMap = goodsCategoryService.getGoodsCategoryMap(
+                Collections.singletonList(goods.getCategoryId())
+            );
+            respVO.setCategoryName(categoryMap.get(goods.getCategoryId()));
+        }
+        return respVO;
+    }
+
+    @Override
+    public PageResult<GoodsRespVO> getGoodsPage(GoodsPageReqVO pageReqVO) {
+        // 1. 查询分页数据（Mapper 返回 DO）
+        PageResult<GoodsDO> pageResult = goodsMapper.selectPage(pageReqVO);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return PageResult.empty(pageResult.getTotal());
+        }
+        
+        // 2. 提取分类ID
+        Set<Long> categoryIds = convertSet(pageResult.getList(), GoodsDO::getCategoryId);
+        
+        // 3. 批量查询分类名称
+        Map<Long, String> categoryMap = goodsCategoryService.getGoodsCategoryMap(categoryIds);
+        
+        // 4. 转换 VO 并填充关联字段
+        return GoodsConvert.INSTANCE.convertPage(pageResult, categoryMap);
+    }
+
+    @Override
+    public Map<Long, String> getGoodsMap(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyMap();
+        }
+        List<GoodsDO> list = goodsMapper.selectBatchIds(ids);
+        return convertMap(list, GoodsDO::getId, GoodsDO::getGoodsName);
+    }
+
+    /**
+     * 校验商品是否存在
+     */
+    private void validateGoodsExists(Long id) {
+        if (goodsMapper.selectById(id) == null) {
+            throw exception(GOODS_NOT_EXISTS);
+        }
+    }
+
+    /**
+     * 校验 SKU 编码唯一性
+     */
+    private void validateGoodsSkuCodeUnique(Long id, String skuCode) {
+        GoodsDO goods = goodsMapper.selectOne(GoodsDO::getSkuCode, skuCode);
+        if (goods == null) {
+            return;
+        }
+        if (id == null || !id.equals(goods.getId())) {
+            throw exception(GOODS_SKU_CODE_DUPLICATE);
+        }
+    }
+}
+```
+
+**关键规则（重要！）：**
+- ✅ Service 层负责业务逻辑和数据关联
+- ✅ **Mapper 返回 DO，Service 负责转换为 VO 并填充关联字段**
+- ✅ **数据关联模式：**
+  1. Mapper 查询主表数据（返回 DO）
+  2. Service 提取关联ID（如 categoryId）
+  3. Service 批量查询关联数据（调用其他 Service 的 getXxxMap 方法）
+  4. Convert 转换时填充关联字段
+- ✅ 增删改前必须做业务校验（存在性、唯一性等）
+- ✅ 使用 `@Valid` 注解触发参数校验
+- ✅ 使用 `@Resource` 注入依赖
+- ✅ 每个方法必须添加详细注释
+
+### 1.6 Convert 规范
+
+```java
+/**
+ * 商品信息 Convert
+ * 使用 MapStruct 进行对象转换
+ *
+ * @author laby
+ */
+@Mapper
+public interface GoodsConvert {
+
+    GoodsConvert INSTANCE = Mappers.getMapper(GoodsConvert.class);
+
+    /**
+     * SaveReqVO -> DO
+     */
+    GoodsDO convert(GoodsSaveReqVO bean);
+
+    /**
+     * DO -> RespVO（不含关联字段）
+     */
+    GoodsRespVO convert(GoodsDO bean);
+
+    /**
+     * DO List -> RespVO List（不含关联字段）
+     */
+    List<GoodsRespVO> convertList(List<GoodsDO> list);
+
+    /**
+     * PageResult<DO> -> PageResult<RespVO>（含关联字段）
+     * 
+     * @param page DO 分页数据
+     * @param categoryMap 分类Map（Key: 分类ID，Value: 分类名称）
+     * @return VO 分页数据（已填充分类名称）
+     */
+    default PageResult<GoodsRespVO> convertPage(PageResult<GoodsDO> page, 
+                                                 Map<Long, String> categoryMap) {
+        PageResult<GoodsRespVO> result = convertPage(page);
+        // 填充关联字段
+        result.getList().forEach(vo -> {
+            if (vo.getCategoryId() != null) {
+                vo.setCategoryName(categoryMap.get(vo.getCategoryId()));
+            }
+        });
+        return result;
+    }
+
+    /**
+     * PageResult<DO> -> PageResult<RespVO>（不含关联字段）
+     */
+    @Mapping(target = "list", source = "list")
+    PageResult<GoodsRespVO> convertPage(PageResult<GoodsDO> page);
+}
+```
+
+**关键规则：**
+- ✅ 使用 `@Mapper` 注解（MapStruct）
+- ✅ 提供 `INSTANCE` 单例
+- ✅ **分页转换时，如需关联字段，使用 default 方法手动填充**
+- ✅ 转换方法必须添加注释
+
+### 1.7 Controller 规范
+
+```java
+/**
+ * 商品信息 Controller
+ * 管理端商品信息的 CRUD API
+ *
+ * @author laby
+ */
+@Tag(name = "管理后台 - 商品信息")
+@RestController
+@RequestMapping("/wms/goods")
+@Validated
+public class GoodsController {
+
+    @Resource
+    private GoodsService goodsService;
+
+    /**
+     * 创建商品
+     */
+    @PostMapping("/create")
+    @Operation(summary = "创建商品")
+    @PreAuthorize("@ss.hasPermission('wms:goods:create')")
+    public CommonResult<Long> createGoods(@Valid @RequestBody GoodsSaveReqVO createReqVO) {
+        return success(goodsService.createGoods(createReqVO));
+    }
+
+    /**
+     * 更新商品
+     */
+    @PutMapping("/update")
+    @Operation(summary = "更新商品")
+    @PreAuthorize("@ss.hasPermission('wms:goods:update')")
+    public CommonResult<Boolean> updateGoods(@Valid @RequestBody GoodsSaveReqVO updateReqVO) {
+        goodsService.updateGoods(updateReqVO);
+        return success(true);
+    }
+
+    /**
+     * 删除商品
+     */
+    @DeleteMapping("/delete")
+    @Operation(summary = "删除商品")
+    @Parameter(name = "id", description = "商品ID", required = true, example = "1")
+    @PreAuthorize("@ss.hasPermission('wms:goods:delete')")
+    public CommonResult<Boolean> deleteGoods(@RequestParam("id") Long id) {
+        goodsService.deleteGoods(id);
+        return success(true);
+    }
+
+    /**
+     * 获得商品详情
+     */
+    @GetMapping("/get")
+    @Operation(summary = "获得商品详情")
+    @Parameter(name = "id", description = "商品ID", required = true, example = "1")
+    @PreAuthorize("@ss.hasPermission('wms:goods:query')")
+    public CommonResult<GoodsRespVO> getGoods(@RequestParam("id") Long id) {
+        return success(goodsService.getGoods(id));
+    }
+
+    /**
+     * 获得商品分页列表
+     */
+    @GetMapping("/page")
+    @Operation(summary = "获得商品分页列表")
+    @PreAuthorize("@ss.hasPermission('wms:goods:query')")
+    public CommonResult<PageResult<GoodsRespVO>> getGoodsPage(@Valid GoodsPageReqVO pageReqVO) {
+        return success(goodsService.getGoodsPage(pageReqVO));
+    }
+
+    /**
+     * 导出商品列表（如需要）
+     */
+    @GetMapping("/export-excel")
+    @Operation(summary = "导出商品Excel")
+    @PreAuthorize("@ss.hasPermission('wms:goods:export')")
+    @ApiAccessLog(operateType = OperateTypeEnum.EXPORT)
+    public void exportGoodsExcel(@Valid GoodsPageReqVO pageReqVO,
+                                  HttpServletResponse response) throws IOException {
+        // 实现导出逻辑
+    }
+}
+```
+
+**关键规则：**
+- ✅ Controller 放在 `controller/admin/` 包下
+- ✅ URL 路径：`/wms/模块名/操作`（如 `/wms/goods/create`）
+- ✅ **权限标识统一格式：`wms:模块名:操作`**（如 `wms:goods:create`）
+- ✅ 标准操作：create、update、delete、get、page、export
+- ✅ 使用 `@PreAuthorize` 控制权限
+- ✅ 使用 `@Operation`、`@Tag`、`@Parameter` 添加 Swagger 文档
+- ✅ 增删改返回 `Boolean`，新增返回 `ID`，查询返回对象
+- ✅ **禁止使用 `@OperateLog`，改用 `@ApiAccessLog`**
+
+---
+
+## 二、前端开发规范（Vue 3 + TypeScript + Element Plus）
+
+### 2.1 项目结构
+
+```
+laby-ui/src/
+├── api/wms/                        # WMS API 接口
+│   ├── category.ts                 # 商品分类 API
+│   └── goods.ts                    # 商品信息 API
+├── views/wms/                      # WMS 页面
+│   ├── category/
+│   │   ├── index.vue               # 分类列表页
+│   │   └── CategoryForm.vue        # 分类表单组件
+│   └── goods/
+│       ├── index.vue               # 商品列表页
+│       └── GoodsForm.vue           # 商品表单组件
+└── utils/
+    └── dict.ts                     # 字典类型定义
+```
+
+### 2.2 API 定义规范
+
+```typescript
+/**
+ * 商品信息 API
+ * 
+ * @author laby
+ * @description 提供商品信息的增删改查功能，支持批次管理、序列号管理等
+ */
+import request from '@/config/axios'
+
+/**
+ * 商品信息 VO
+ * 用于商品信息的数据传输
+ */
+export interface GoodsVO {
+  id?: number // 商品ID（编辑时必传）
+  skuCode: string // SKU编码，唯一标识，如：SKU-001
+  goodsName: string // 商品名称，如：iPhone 15 Pro Max
+  categoryId?: number // 商品分类ID
+  categoryName?: string // 商品分类名称（关联查询字段，不需要提交）
+  unit: number // 计量单位：1-个，2-箱，3-千克，4-吨等
+  status: number // 状态：0-禁用，1-启用
+  createTime?: Date // 创建时间
+}
+
+/**
+ * 商品分页查询 VO
+ */
+export interface GoodsPageReqVO extends PageParam {
+  skuCode?: string // SKU编码（模糊搜索）
+  goodsName?: string // 商品名称（模糊搜索）
+  categoryId?: number // 商品分类ID（精确搜索）
+  status?: number // 状态：0-禁用，1-启用
+  createTime?: Date[] // 创建时间范围
+}
+
+/**
+ * 创建商品
+ * 
+ * @param data 商品信息
+ * @returns 返回创建的商品ID
+ */
+export const createGoods = (data: GoodsVO) => {
+  return request.post({ url: '/wms/goods/create', data })
+}
+
+/**
+ * 更新商品
+ * 
+ * @param data 商品信息（必须包含id）
+ * @returns 返回是否成功
+ */
+export const updateGoods = (data: GoodsVO) => {
+  return request.put({ url: '/wms/goods/update', data })
+}
+
+/**
+ * 删除商品
+ * 
+ * @param id 商品ID
+ * @returns 返回是否成功
+ */
+export const deleteGoods = (id: number) => {
+  return request.delete({ url: '/wms/goods/delete?id=' + id })
+}
+
+/**
+ * 获取商品详情
+ * 
+ * @param id 商品ID
+ * @returns 返回商品详细信息
+ */
+export const getGoods = (id: number) => {
+  return request.get({ url: '/wms/goods/get?id=' + id })
+}
+
+/**
+ * 获取商品分页列表
+ * 
+ * @param params 分页查询参数
+ * @returns 返回分页数据
+ */
+export const getGoodsPage = (params: GoodsPageReqVO) => {
+  return request.get({ url: '/wms/goods/page', params })
+}
+```
+
+**关键规则：**
+- ✅ API 文件必须添加详细的文件注释
+- ✅ 接口定义必须与后端 VO 保持一致
+- ✅ **字典字段类型必须为 `number`（不能用 `string`）**
+- ✅ 每个 API 方法必须添加 JSDoc 注释
+- ✅ URL 路径必须与后端 Controller 保持一致
+- ✅ **PageParam 是全局类型，不需要导入**
+
+### 2.3 列表页规范
+
+```vue
+<!--
+  商品信息列表页
+  
+  功能说明：
+  1. 商品信息的查询、新增、编辑、删除
+  2. 支持多条件搜索（SKU、名称、分类、品牌、状态）
+  3. 支持分页显示
+  4. 权限控制：wms:goods:query、create、update、delete
+  
+  @author laby
+  @date 2025-10-28
+-->
+<template>
+  <ContentWrap>
+    <!-- 搜索工作栏 -->
+    <el-form class="-mb-15px" :model="queryParams" ref="queryFormRef" :inline="true">
+      <!-- 搜索条件 -->
+      <el-form-item label="SKU编码" prop="skuCode">
+        <el-input v-model="queryParams.skuCode" placeholder="请输入SKU编码" clearable />
+      </el-form-item>
+      
+      <!-- 分类下拉框 -->
+      <el-form-item label="商品分类" prop="categoryId">
+        <el-select v-model="queryParams.categoryId" placeholder="请选择商品分类" clearable>
+          <el-option
+            v-for="category in categoryList"
+            :key="category.id"
+            :label="category.categoryName"
+            :value="category.id"
+          />
+        </el-select>
+      </el-form-item>
+      
+      <!-- 状态字典下拉框 -->
+      <el-form-item label="状态" prop="status">
+        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
+          <el-option
+            v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+          />
+        </el-select>
+      </el-form-item>
+      
+      <!-- 操作按钮 -->
+      <el-form-item>
+        <el-button @click="handleQuery">搜索</el-button>
+        <el-button @click="resetQuery">重置</el-button>
+        <el-button type="primary" @click="openForm('create')" v-hasPermi="['wms:goods:create']">
+          新增
+        </el-button>
+      </el-form-item>
+    </el-form>
+  </ContentWrap>
+
+  <!-- 列表 -->
+  <ContentWrap>
+    <el-table v-loading="loading" :data="list">
+      <el-table-column label="SKU编码" prop="skuCode" width="140px" />
+      <el-table-column label="商品名称" prop="goodsName" min-width="180px" show-overflow-tooltip />
+      
+      <!-- 关联字段显示 -->
+      <el-table-column label="分类" prop="categoryName" width="120px" />
+      
+      <!-- 字典字段显示 -->
+      <el-table-column label="单位" prop="unit" width="80px">
+        <template #default="scope">
+          <dict-tag :type="DICT_TYPE.WMS_GOODS_UNIT" :value="scope.row.unit" />
+        </template>
+      </el-table-column>
+      
+      <el-table-column label="状态" prop="status" width="80px">
+        <template #default="scope">
+          <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
+        </template>
+      </el-table-column>
+      
+      <!-- 操作列 -->
+      <el-table-column label="操作" fixed="right" width="180px">
+        <template #default="scope">
+          <el-button link @click="openForm('update', scope.row.id)" v-hasPermi="['wms:goods:update']">
+            编辑
+          </el-button>
+          <el-button link type="danger" @click="handleDelete(scope.row.id)" v-hasPermi="['wms:goods:delete']">
+            删除
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    
+    <!-- 分页 -->
+    <Pagination
+      :total="total"
+      v-model:page="queryParams.pageNo"
+      v-model:limit="queryParams.pageSize"
+      @pagination="getList"
+    />
+  </ContentWrap>
+
+  <!-- 表单弹窗 -->
+  <GoodsForm ref="formRef" @success="getList" />
+</template>
+
+<script setup lang="ts">
+import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import * as GoodsApi from '@/api/wms/goods'
+import * as GoodsCategoryApi from '@/api/wms/category'
+import GoodsForm from './GoodsForm.vue'
+
+defineOptions({ name: 'WmsGoods' })
+
+const message = useMessage()
+const { t } = useI18n()
+
+const loading = ref(true) // 列表加载中
+const list = ref([]) // 列表数据
+const total = ref(0) // 总条数
+const categoryList = ref([]) // 分类列表
+
+// 查询参数
+const queryParams = reactive({
+  pageNo: 1,
+  pageSize: 10,
+  skuCode: undefined,
+  goodsName: undefined,
+  categoryId: undefined,
+  status: undefined
+})
+const queryFormRef = ref()
+
+/**
+ * 查询列表
+ */
+const getList = async () => {
+  loading.value = true
+  try {
+    const data = await GoodsApi.getGoodsPage(queryParams)
+    list.value = data.list
+    total.value = data.total
+  } finally {
+    loading.value = false
+  }
+}
+
+/**
+ * 搜索按钮操作
+ */
+const handleQuery = () => {
+  queryParams.pageNo = 1
+  getList()
+}
+
+/**
+ * 重置按钮操作
+ */
+const resetQuery = () => {
+  queryFormRef.value.resetFields()
+  handleQuery()
+}
+
+/**
+ * 打开表单
+ */
+const formRef = ref()
+const openForm = (type: string, id?: number) => {
+  formRef.value.open(type, id)
+}
+
+/**
+ * 删除操作
+ */
+const handleDelete = async (id: number) => {
+  try {
+    await message.delConfirm()
+    await GoodsApi.deleteGoods(id)
+    message.success(t('common.delSuccess'))
+    await getList()
+  } catch {}
+}
+
+/**
+ * 初始化
+ */
+onMounted(async () => {
+  await getList()
+  // 加载分类列表（用于搜索下拉框）
+  categoryList.value = await GoodsCategoryApi.getGoodsCategorySimpleList()
+})
+</script>
+```
+
+**关键规则：**
+- ✅ 列表页必须添加详细的页面注释
+- ✅ 使用 `v-hasPermi` 指令控制按钮权限
+- ✅ **权限标识格式：`['wms:模块名:操作']`**
+- ✅ **字典字段必须使用 `getIntDictOptions`（不能用 `getStrDictOptions`）**
+- ✅ **字典显示使用 `<dict-tag :type="DICT_TYPE.XXX" :value="scope.row.xxx" />`**
+- ✅ 关联字段（如 categoryName）直接显示，后端已填充
+- ✅ 长文本使用 `show-overflow-tooltip` 自动省略
+- ✅ 删除前必须二次确认
+- ✅ 所有函数必须添加注释
+
+### 2.4 表单组件规范
+
+```vue
+<!--
+  商品信息表单组件
+  
+  功能说明：
+  1. 支持新增和编辑商品
+  2. 表单验证
+  3. 成功后通知父组件刷新列表
+  
+  @author laby
+  @date 2025-10-28
+-->
+<template>
+  <Dialog :title="dialogTitle" v-model="dialogVisible">
+    <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px">
+      <!-- SKU编码 -->
+      <el-form-item label="SKU编码" prop="skuCode">
+        <el-input v-model="formData.skuCode" placeholder="请输入SKU编码" />
+      </el-form-item>
+      
+      <!-- 商品名称 -->
+      <el-form-item label="商品名称" prop="goodsName">
+        <el-input v-model="formData.goodsName" placeholder="请输入商品名称" />
+      </el-form-item>
+      
+      <!-- 分类下拉框 -->
+      <el-form-item label="商品分类" prop="categoryId">
+        <el-select v-model="formData.categoryId" placeholder="请选择商品分类" class="!w-full">
+          <el-option
+            v-for="category in categoryList"
+            :key="category.id"
+            :label="category.categoryName"
+            :value="category.id"
+          />
+        </el-select>
+      </el-form-item>
+      
+      <!-- 计量单位（字典） -->
+      <el-form-item label="计量单位" prop="unit">
+        <el-select v-model="formData.unit" placeholder="请选择计量单位" class="!w-full">
+          <el-option
+            v-for="dict in getIntDictOptions(DICT_TYPE.WMS_GOODS_UNIT)"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+          />
+        </el-select>
+      </el-form-item>
+      
+      <!-- 状态（单选） -->
+      <el-form-item label="状态" prop="status">
+        <el-radio-group v-model="formData.status">
+          <el-radio
+            v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
+            :key="dict.value"
+            :label="dict.value"
+          >
+            {{ dict.label }}
+          </el-radio>
+        </el-radio-group>
+      </el-form-item>
+    </el-form>
+    
+    <template #footer>
+      <el-button @click="submitForm" type="primary" :disabled="formLoading">确 定</el-button>
+      <el-button @click="dialogVisible = false">取 消</el-button>
+    </template>
+  </Dialog>
+</template>
+
+<script setup lang="ts">
+import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import * as GoodsApi from '@/api/wms/goods'
+import * as GoodsCategoryApi from '@/api/wms/category'
+
+defineOptions({ name: 'GoodsForm' })
+
+const { t } = useI18n()
+const message = useMessage()
+
+const dialogVisible = ref(false)
+const dialogTitle = ref('')
+const formLoading = ref(false)
+const formType = ref('')
+const categoryList = ref([])
+
+// 表单数据
+const formData = ref({
+  id: undefined,
+  skuCode: undefined,
+  goodsName: undefined,
+  categoryId: undefined,
+  unit: 1, // 默认值：个
+  status: 1 // 默认值：启用
+})
+
+// 表单验证规则
+const formRules = reactive({
+  skuCode: [{ required: true, message: 'SKU编码不能为空', trigger: 'blur' }],
+  goodsName: [{ required: true, message: '商品名称不能为空', trigger: 'blur' }],
+  unit: [{ required: true, message: '请选择计量单位', trigger: 'change' }],
+  status: [{ required: true, message: '请选择状态', trigger: 'change' }]
+})
+const formRef = ref()
+
+/**
+ * 打开弹窗
+ */
+const open = async (type: string, id?: number) => {
+  dialogVisible.value = true
+  dialogTitle.value = t('action.' + type)
+  formType.value = type
+  resetForm()
+  
+  // 修改时，加载数据
+  if (id) {
+    formLoading.value = true
+    try {
+      formData.value = await GoodsApi.getGoods(id)
+    } finally {
+      formLoading.value = false
+    }
+  }
+  
+  // 加载分类列表
+  categoryList.value = await GoodsCategoryApi.getGoodsCategorySimpleList()
+}
+defineExpose({ open })
+
+/**
+ * 提交表单
+ */
+const emit = defineEmits(['success'])
+const submitForm = async () => {
+  await formRef.value.validate()
+  formLoading.value = true
+  try {
+    const data = formData.value as unknown as GoodsApi.GoodsVO
+    if (formType.value === 'create') {
+      await GoodsApi.createGoods(data)
+      message.success(t('common.createSuccess'))
+    } else {
+      await GoodsApi.updateGoods(data)
+      message.success(t('common.updateSuccess'))
+    }
+    dialogVisible.value = false
+    emit('success')
+  } finally {
+    formLoading.value = false
+  }
+}
+
+/**
+ * 重置表单
+ */
+const resetForm = () => {
+  formData.value = {
+    id: undefined,
+    skuCode: undefined,
+    goodsName: undefined,
+    categoryId: undefined,
+    unit: 1,
+    status: 1
+  }
+  formRef.value?.resetFields()
+}
+</script>
+```
+
+**关键规则：**
+- ✅ 表单组件必须添加详细注释
+- ✅ 使用 `defineExpose({ open })` 暴露打开方法
+- ✅ 使用 `defineEmits(['success'])` 通知父组件
+- ✅ **字典下拉框必须使用 `getIntDictOptions`**
+- ✅ **字典字段的 v-model 绑定的是 number 类型**
+- ✅ 必填字段必须设置验证规则
+- ✅ 提交前必须执行 `validate()`
+- ✅ 所有函数必须添加注释
+
+### 2.5 字典配置规范
+
+```typescript
+// laby-ui/src/utils/dict.ts
+
+export enum DICT_TYPE {
+  // ========== WMS 模块 ==========
+  WMS_WAREHOUSE_TYPE = 'wms_warehouse_type', // 仓库类型
+  WMS_WAREHOUSE_AREA_TYPE = 'wms_warehouse_area_type', // 库区类型
+  WMS_WAREHOUSE_LOCATION_TYPE = 'wms_warehouse_location_type', // 库位类型
+  WMS_LOCATION_STATUS = 'wms_location_status', // 库位状态
+  WMS_GOODS_UNIT = 'wms_goods_unit', // 商品单位
+  WMS_INBOUND_TYPE = 'wms_inbound_type', // 入库类型
+  WMS_OUTBOUND_TYPE = 'wms_outbound_type', // 出库类型
+  // ... 其他字典
+}
+```
+
+**关键规则：**
+- ✅ 字典类型定义在 `DICT_TYPE` 枚举中
+- ✅ 命名规范：`WMS_模块_字段`（全大写，下划线分隔）
+- ✅ 必须添加注释说明
+- ✅ **前端使用 `getIntDictOptions` 获取字典（因为值是整数）**
+
+---
+
+## 三、数据库设计规范
+
+### 3.1 表结构规范
+
+```sql
+-- 商品信息表
+CREATE TABLE IF NOT EXISTS `wms_goods` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '商品ID（主键）',
+  `sku_code` VARCHAR(50) NOT NULL COMMENT 'SKU编码，唯一标识',
+  `goods_name` VARCHAR(200) NOT NULL COMMENT '商品名称',
+  `category_id` BIGINT DEFAULT NULL COMMENT '商品分类ID',
+  `brand` VARCHAR(100) DEFAULT NULL COMMENT '品牌',
+  `unit` TINYINT(4) DEFAULT 1 COMMENT '计量单位（字典：wms_goods_unit）：1-个，2-箱，3-千克，4-吨等',
+  `status` TINYINT(4) DEFAULT 1 COMMENT '状态：0-禁用，1-启用',
+  `creator` VARCHAR(64) DEFAULT '' COMMENT '创建者',
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` VARCHAR(64) DEFAULT '' COMMENT '更新者',
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` BIT(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_sku_code` (`sku_code`) COMMENT 'SKU编码唯一索引',
+  KEY `idx_category_id` (`category_id`) COMMENT '分类ID索引',
+  KEY `idx_create_time` (`create_time`) COMMENT '创建时间索引'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WMS-商品信息表';
+```
+
+**关键规则（重要！）：**
+- ✅ 表名：`wms_模块名`（小写，下划线分隔）
+- ✅ 主键：`id BIGINT NOT NULL AUTO_INCREMENT`
+- ✅ 必须包含：`creator`、`create_time`、`updater`、`update_time`、`deleted`
+- ✅ **字典字段必须使用 `TINYINT(4)` 类型（不能用 VARCHAR）**
+- ✅ **字典字段注释必须说明字典类型和取值范围**
+- ✅ 状态字段：`status TINYINT(4) DEFAULT 1`（0-禁用，1-启用）
+- ✅ 唯一字段必须添加唯一索引：`UNIQUE KEY uk_xxx`
+- ✅ 关联字段必须添加普通索引：`KEY idx_xxx`
+- ✅ 字符集：`utf8mb4`，排序规则：`utf8mb4_unicode_ci`
+- ✅ 每个字段必须添加详细的 `COMMENT`
+
+### 3.2 字典数据规范
+
+```sql
+-- 1. 定义字典类型
+INSERT INTO system_dict_type (name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time)
+VALUES ('商品单位', 'wms_goods_unit', 0, 'WMS-商品计量单位', '1', NOW(), '1', NOW(), b'0', NULL);
+
+-- 2. 定义字典数据（值必须是整数）
+INSERT INTO system_dict_data (sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES
+(1, '个', '1', 'wms_goods_unit', 0, 'primary', '', '单个计量', '1', NOW(), '1', NOW(), b'0'),
+(2, '箱', '2', 'wms_goods_unit', 0, 'success', '', '箱装计量', '1', NOW(), '1', NOW(), b'0'),
+(3, '千克', '3', 'wms_goods_unit', 0, 'info', '', '重量计量', '1', NOW(), '1', NOW(), b'0'),
+(4, '吨', '4', 'wms_goods_unit', 0, 'warning', '', '大宗计量', '1', NOW(), '1', NOW(), b'0');
+```
+
+**关键规则（重要！）：**
+- ✅ **字典值（value）必须是整数字符串：'1', '2', '3'（不能用 'PCS', 'BOX'）**
+- ✅ 字典类型命名：`wms_模块_字段`（小写，下划线分隔）
+- ✅ `status` 为 0 表示启用
+- ✅ `color_type` 可选值：primary、success、info、warning、danger
+- ✅ 必须添加 `remark` 说明字典用途
+
+### 3.3 菜单权限规范
+
+```sql
+-- 商品管理菜单
+INSERT INTO system_menu (name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted)
+VALUES ('商品信息', '', 2, 1, @wms_goods_parent_id, 'goods', '', 'wms/goods/index', 'WmsGoods', 0, b'1', b'1', b'1', '1', NOW(), '1', NOW(), b'0');
+
+-- 商品信息权限
+INSERT INTO system_menu (name, permission, type, sort, parent_id, path, icon, component, status, visible, keep_alive, creator, create_time, updater, update_time, deleted) VALUES
+('商品查询', 'wms:goods:query', 3, 1, @wms_goods_menu_id, '', '', '', 0, b'1', b'1', '1', NOW(), '1', NOW(), b'0'),
+('商品创建', 'wms:goods:create', 3, 2, @wms_goods_menu_id, '', '', '', 0, b'1', b'1', '1', NOW(), '1', NOW(), b'0'),
+('商品更新', 'wms:goods:update', 3, 3, @wms_goods_menu_id, '', '', '', 0, b'1', b'1', '1', NOW(), '1', NOW(), b'0'),
+('商品删除', 'wms:goods:delete', 3, 4, @wms_goods_menu_id, '', '', '', 0, b'1', b'1', '1', NOW(), '1', NOW(), b'0'),
+('商品导出', 'wms:goods:export', 3, 5, @wms_goods_menu_id, '', '', '', 0, b'1', b'1', '1', NOW(), '1', NOW(), b'0');
+```
+
+**关键规则：**
+- ✅ **权限标识统一格式：`wms:模块名:操作`**（小写，冒号分隔）
+- ✅ 标准操作：query、create、update、delete、export
+- ✅ 菜单类型：1-目录，2-菜单，3-按钮
+- ✅ `component_name` 必须与前端 `defineOptions({ name: 'XxxXxx' })` 一致
+- ✅ 菜单路径：`wms/模块名/index`
+
+---
+
+## 四、Starter 开发规范
+
+### 4.1 Starter 项目结构
+
+参考其他 starter（如 `laby-spring-boot-starter-redis`、`laby-spring-boot-starter-mybatis`），标准结构如下：
+
+```
+laby-spring-boot-starter-xxx/
+├── pom.xml                                    # Maven 配置
+├── README.md                                  # 项目说明文档
+└── src/
+    ├── main/
+    │   ├── java/
+    │   │   └── com/laby/framework/xxx/
+    │   │       ├── config/                    # 配置类（必须）
+    │   │       │   └── LabyXxxAutoConfiguration.java
+    │   │       ├── core/                      # 核心功能（必须）
+    │   │       │   ├── enums/                 # 枚举类（可选）
+    │   │       │   ├── model/                 # 模型类（可选）
+    │   │       │   ├── service/               # 服务类（可选）
+    │   │       │   └── util/                  # 工具类（可选）
+    │   │       └── package-info.java          # 包说明（必须）
+    │   └── resources/
+    │       └── META-INF/spring/               # Spring Boot 自动配置（必须）
+    │           └── org.springframework.boot.autoconfigure.AutoConfiguration.imports
+    └── test/
+        └── java/
+            └── com/laby/framework/xxx/
+                └── XxxServiceTest.java        # 单元测试
+```
+
+**关键规则：**
+- ✅ 包路径：`com.laby.framework.xxx`（xxx 是功能模块名）
+- ✅ 必须有 `config` 包，包含自动配置类
+- ✅ 必须有 `core` 包，包含核心功能
+- ✅ 必须有 `package-info.java` 说明包功能
+- ✅ 必须有自动配置文件：`org.springframework.boot.autoconfigure.AutoConfiguration.imports`
+- ✅ 配置类命名：`LabyXxxAutoConfiguration.java`
+
+### 4.2 POM 文件规范
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.laby.boot</groupId>
+        <artifactId>laby-framework</artifactId>
+        <version>${revision}</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>laby-spring-boot-starter-xxx</artifactId>
+    <packaging>jar</packaging>
+
+    <name>${project.artifactId}</name>
+    <description>功能简要描述</description>
+    <url>https://github.com/labymkd/laby-service</url>
+
+    <dependencies>
+        <!-- 必需：laby-common 基础组件 -->
+        <dependency>
+            <groupId>com.laby.boot</groupId>
+            <artifactId>laby-common</artifactId>
+        </dependency>
+
+        <!-- 其他依赖根据实际需要添加 -->
+    </dependencies>
+
+</project>
+```
+
+**关键规则：**
+- ✅ 父 POM：`laby-framework`
+- ✅ groupId：`com.laby.boot`
+- ✅ artifactId：`laby-spring-boot-starter-xxx`
+- ✅ 必须依赖 `laby-common`
+- ✅ 版本号使用 `${revision}`
+
+### 4.3 自动配置类规范
+
+```java
+package com.laby.framework.codegen.config;
+
+import com.laby.framework.codegen.core.service.CodeGeneratorService;
+import com.laby.framework.codegen.core.service.impl.CodeGeneratorServiceImpl;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.core.StringRedisTemplate;
+
+/**
+ * 编码生成器自动配置类
+ * <p>
+ * 功能说明：
+ * 1. 自动配置 CodeGeneratorService Bean
+ * 2. 依赖 Redis 环境，需要确保 Redis 配置正确
+ * <p>
+ * 配置要求：
+ * - 项目中已配置 spring.redis 相关配置
+ * - Redis 服务正常运行
+ * <p>
+ * 使用方式：
+ * 引入依赖后自动生效，无需额外配置
+ *
+ * @author laby
+ */
+@Slf4j
+@AutoConfiguration
+public class LabyCodeGeneratorAutoConfiguration {
+
+    /**
+     * 创建编码生成服务 Bean
+     * <p>
+     * 依赖说明：
+     * - StringRedisTemplate：用于 Redis 操作，存储编码序号
+     *
+     * @param stringRedisTemplate Spring 提供的 Redis 模板
+     * @return 编码生成服务实例
+     */
+    @Bean
+    public CodeGeneratorService codeGeneratorService(StringRedisTemplate stringRedisTemplate) {
+        log.info("[编码生成器] 初始化完成，使用 Redis 作为序号存储");
+        return new CodeGeneratorServiceImpl(stringRedisTemplate);
+    }
+}
+```
+
+**关键规则：**
+- ✅ 类名：`LabyXxxAutoConfiguration`（必须以 Laby 开头，AutoConfiguration 结尾）
+- ✅ 使用 `@AutoConfiguration` 注解
+- ✅ 使用 `@Slf4j` 记录日志
+- ✅ 每个 Bean 方法必须添加详细注释
+- ✅ 初始化时打印日志，方便排查问题
+- ✅ 必须添加类级别注释说明功能和使用方式
+
+### 4.4 自动配置注册文件
+
+```
+# 文件路径：src/main/resources/META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports
+
+com.laby.framework.xxx.config.LabyXxxAutoConfiguration
+```
+
+**关键规则：**
+- ✅ 文件名必须是：`org.springframework.boot.autoconfigure.AutoConfiguration.imports`
+- ✅ 文件路径必须是：`META-INF/spring/`
+- ✅ 每行一个配置类的全限定名
+- ✅ **不要有空行或注释**
+
+### 4.5 package-info.java 规范
+
+```java
+/**
+ * 业务编码生成器
+ * <p>
+ * 功能说明：
+ * 1. 为 WMS 系统提供统一的业务编码生成服务
+ * 2. 基于 Redis 实现分布式环境下的编码唯一性
+ * 3. 支持灵活的编码规则配置（前缀、日期、序号等）
+ * 4. 支持批量生成，提升性能
+ * <p>
+ * 主要特性：
+ * - 分布式唯一性保证
+ * - 支持每日/每月/全局递增
+ * - 批量生成性能优化
+ * - 编码格式校验
+ * <p>
+ * 使用示例：
+ * <pre>
+ * {@code
+ * @Resource
+ * private CodeGeneratorService codeGeneratorService;
+ *
+ * // 生成入库单号
+ * String inboundNo = codeGeneratorService.generateCode(CodeTypeEnum.INBOUND);
+ * // 结果: IN20251029001
+ * }
+ * </pre>
+ *
+ * @author laby
+ */
+package com.laby.framework.codegen;
+```
+
+**关键规则：**
+- ✅ 必须添加包级别注释
+- ✅ 说明包的功能、特性、使用方式
+- ✅ 提供简单的使用示例
+- ✅ 添加 `@author` 信息
+
+### 4.6 核心服务类规范
+
+#### 服务接口
+
+```java
+package com.laby.framework.codegen.core.service;
+
+/**
+ * 编码生成服务接口
+ * <p>
+ * 功能说明：
+ * 1. 生成业务编码（单个或批量）
+ * 2. 查询当前序号
+ * 3. 重置序号
+ * 4. 校验编码格式
+ * <p>
+ * 使用场景：
+ * - 创建入库单、出库单等业务单据时生成单号
+ * - 创建商品SKU、供应商编码等主数据时生成编码
+ * - 批量导入数据时批量生成编码
+ *
+ * @author laby
+ */
+public interface CodeGeneratorService {
+
+    /**
+     * 生成单个编码（使用默认规则）
+     * <p>
+     * 默认规则：前缀 + 日期(yyyyMMdd) + 3位序号，每日重置
+     * <p>
+     * 使用示例：
+     * <pre>
+     * {@code
+     * // 生成入库单号
+     * String inboundNo = codeGeneratorService.generateCode(CodeTypeEnum.INBOUND);
+     * // 结果：IN20251029001（当日第1个入库单）
+     * }
+     * </pre>
+     *
+     * @param codeType 编码类型，定义在 CodeTypeEnum 枚举中
+     * @return 生成的编码字符串
+     */
+    String generateCode(CodeTypeEnum codeType);
+    
+    // ... 其他方法
+}
+```
+
+#### 服务实现类
+
+```java
+package com.laby.framework.codegen.core.service.impl;
+
+/**
+ * 编码生成服务实现类
+ * <p>
+ * 核心技术：
+ * 1. 基于 Redis INCR 命令实现分布式环境下的编码唯一性
+ * 2. 批量生成时一次性获取序号区间，减少 Redis 调用次数
+ * 3. 每日重置的编码自动设置过期时间
+ * <p>
+ * 线程安全：
+ * - Redis INCR 命令是原子操作，保证多线程和分布式环境下的序号唯一性
+ * <p>
+ * 性能优化：
+ * - 单个生成：~2ms
+ * - 批量生成100个：~5ms（优化后） vs ~200ms（循环调用）
+ *
+ * @author laby
+ */
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class CodeGeneratorServiceImpl implements CodeGeneratorService {
+
+    private final StringRedisTemplate stringRedisTemplate;
+
+    @Override
+    public String generateCode(CodeTypeEnum codeType) {
+        // 1. 根据编码类型构建默认规则
+        CodeRule rule = buildRuleByType(codeType);
+        return generateCode(rule);
+    }
+    
+    // ... 其他方法实现
+    
+    /**
+     * 构建完整编码
+     * <p>
+     * 编码格式（按顺序拼接）：
+     * 1. 前缀（必需）
+     * 2. 分隔符（可选）
+     * 3. 日期（可选）
+     * 4. 分隔符（可选）
+     * 5. 补充信息（可选）
+     * 6. 分隔符（可选）
+     * 7. 序号（必需，补零）
+     *
+     * @param rule    编码规则
+     * @param dateStr 日期字符串
+     * @param serial  序号
+     * @return 完整编码
+     */
+    private String buildCode(CodeRule rule, String dateStr, Long serial) {
+        // 实现逻辑...
+    }
+}
+```
+
+**关键规则：**
+- ✅ 接口和实现类必须添加详细的类注释
+- ✅ 说明核心技术、线程安全、性能等关键信息
+- ✅ 每个方法必须添加注释
+- ✅ 私有方法也要添加注释说明用途
+- ✅ 使用 `@RequiredArgsConstructor` 进行依赖注入
+- ✅ 使用 `@Slf4j` 记录日志
+
+### 4.7 枚举类规范
+
+```java
+package com.laby.framework.codegen.core.enums;
+
+/**
+ * 业务编码类型枚举
+ * <p>
+ * 定义 WMS 系统中所有业务编码的类型、前缀和规则
+ * <p>
+ * 编码格式：前缀 + 日期(yyyyMMdd) + 序号(3位)
+ * 示例：IN20251029001 表示 2025年10月29日的第1个入库单
+ * <p>
+ * 使用场景：
+ * 1. 业务单据：入库单、出库单、拣货波次等（每日重置）
+ * 2. 主数据：供应商、客户、商品等（全局递增）
+ * 3. 仓库资源：仓库、库区、库位等（全局递增）
+ *
+ * @author laby
+ */
+@Getter
+@AllArgsConstructor
+public enum CodeTypeEnum {
+
+    /**
+     * 仓库编码
+     * 格式：WH20251029001
+     * 说明：仓库主体编码，全局唯一
+     */
+    WAREHOUSE("WH", "仓库编码", 3),
+
+    /**
+     * 入库单号
+     * 格式：IN20251029001
+     * 说明：入库业务单据号，每日重置
+     */
+    INBOUND("IN", "入库单号", 3),
+    
+    // ... 其他枚举值
+
+    /**
+     * 编码前缀
+     * 例如：IN、OUT、SKU 等
+     */
+    private final String prefix;
+
+    /**
+     * 编码描述
+     * 例如：入库单号、出库单号、商品SKU编码
+     */
+    private final String description;
+
+    /**
+     * 序号位数（不含日期部分）
+     * 例如：3 表示生成 001、002、...、999
+     */
+    private final Integer serialLength;
+}
+```
+
+**关键规则：**
+- ✅ 枚举必须添加详细的类注释
+- ✅ 每个枚举值必须添加注释说明（格式、说明）
+- ✅ 枚举字段必须添加注释
+- ✅ 使用 `@Getter` 和 `@AllArgsConstructor`
+
+### 4.8 模型类规范
+
+```java
+package com.laby.framework.codegen.core.model;
+
+/**
+ * 编码生成规则
+ * <p>
+ * 用于自定义编码生成的规则配置
+ * <p>
+ * 使用场景：
+ * 1. 当默认规则不满足需求时，可以自定义规则
+ * 2. 例如：需要在编码中加入仓库简称、区域代码等
+ * <p>
+ * 使用示例：
+ * <pre>
+ * {@code
+ * // 生成带城市代码的仓库编码：WH-BJ-20251029-001
+ * CodeRule rule = CodeRule.builder()
+ *     .prefix("WH")
+ *     .separator("-")
+ *     .extraInfo("BJ")  // 北京
+ *     .dateFormat("yyyyMMdd")
+ *     .serialLength(3)
+ *     .dailyReset(true)
+ *     .build();
+ * }
+ * </pre>
+ *
+ * @author laby
+ */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class CodeRule {
+
+    /**
+     * 编码前缀
+     * 例如：WH（仓库）、IN（入库）、OUT（出库）
+     * 必填项
+     */
+    private String prefix;
+
+    /**
+     * 是否包含日期
+     * true - 包含日期，如：IN20251029001
+     * false - 不含日期，如：SUP000001
+     * 默认值：true
+     */
+    @Builder.Default
+    private Boolean includeDate = true;
+    
+    // ... 其他字段
+}
+```
+
+**关键规则：**
+- ✅ 模型类必须添加详细的类注释
+- ✅ 说明使用场景和示例
+- ✅ 每个字段必须添加注释
+- ✅ 使用 Builder 模式时，说明默认值
+- ✅ 使用 `@Data`、`@Builder`、`@NoArgsConstructor`、`@AllArgsConstructor`
+
+### 4.9 集成到项目
+
+#### 步骤1：添加到父 POM
+
+```xml
+<!-- laby-framework/pom.xml -->
+<modules>
+    <module>laby-common</module>
+    <module>laby-spring-boot-starter-mybatis</module>
+    <module>laby-spring-boot-starter-redis</module>
+    <!-- 其他模块 -->
+    
+    <!-- 新增：编码生成器 -->
+    <module>laby-spring-boot-starter-code-generator</module>
+</modules>
+```
+
+#### 步骤2：添加到依赖管理
+
+```xml
+<!-- laby-dependencies/pom.xml -->
+<dependency>
+    <groupId>com.laby</groupId>
+    <artifactId>laby-spring-boot-starter-code-generator</artifactId>
+    <version>${revision}</version>
+</dependency>
+```
+
+注意：groupId 可能是 `com.laby` 或 `com.laby.boot`，根据实际情况调整。
+
+#### 步骤3：业务模块引入
+
+```xml
+<!-- laby-module-wms/pom.xml -->
+<dependency>
+    <groupId>com.laby</groupId>
+    <artifactId>laby-spring-boot-starter-code-generator</artifactId>
+</dependency>
+```
+
+### 4.10 单元测试规范
+
+```java
+package com.laby.framework.codegen;
+
+import com.laby.framework.codegen.core.enums.CodeTypeEnum;
+import com.laby.framework.codegen.core.service.CodeGeneratorService;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+ * 编码生成器单元测试
+ * <p>
+ * 测试内容：
+ * 1. 标准编码生成
+ * 2. 批量编码生成
+ * 3. 自定义规则生成
+ * 4. 编码格式校验
+ * 5. 序号查询和重置
+ *
+ * @author laby
+ */
+class CodeGeneratorServiceTest {
+
+    /**
+     * 测试生成入库单号
+     * 预期结果：IN + 8位日期 + 3位序号
+     */
+    @Test
+    void testGenerateInboundCode() {
+        // 测试逻辑...
+    }
+}
+```
+
+**关键规则：**
+- ✅ 测试类必须添加详细注释
+- ✅ 每个测试方法必须添加注释说明测试内容和预期结果
+- ✅ 使用 `@Test` 注解
+- ✅ 使用断言验证结果
+
+### 4.11 README 文档规范
+
+```markdown
+# Starter 名称
+
+简要说明（一句话）
+
+## 功能特性
+
+- 特性1
+- 特性2
+- 特性3
+
+## 快速使用
+
+```java
+// 最简单的使用示例
+```
+
+## 配置说明
+
+（如果有配置项）
+
+## API 文档
+
+（核心接口说明）
+```
+
+**关键规则：**
+- ✅ 必须包含 README.md
+- ✅ 简洁明了，重点突出
+- ✅ 提供快速使用示例
+- ✅ 不要过于详细（详细文档另外编写）
+
+### 4.12 Starter 开发清单
+
+开发一个新的 Starter 需要完成以下步骤：
+
+**必需文件：**
+- [ ] `pom.xml` - Maven 配置
+- [ ] `package-info.java` - 包说明
+- [ ] `LabyXxxAutoConfiguration.java` - 自动配置类
+- [ ] `org.springframework.boot.autoconfigure.AutoConfiguration.imports` - 自动配置注册
+- [ ] `README.md` - 项目说明
+- [ ] 核心功能类（Service、Util 等）
+
+**可选文件：**
+- [ ] 枚举类（`core/enums/`）
+- [ ] 模型类（`core/model/`）
+- [ ] 配置属性类（`config/XxxProperties.java`）
+- [ ] 单元测试
+- [ ] 详细文档（`docs/`）
+
+**集成步骤：**
+- [ ] 添加到 `laby-framework/pom.xml`
+- [ ] 添加到 `laby-dependencies/pom.xml`
+- [ ] 在业务模块中引入依赖
+- [ ] 编译测试
+- [ ] 编写使用文档
+
+### 4.13 Starter 开发注意事项
+
+1. **命名规范**
+   - Starter 名称：`laby-spring-boot-starter-xxx`
+   - 包路径：`com.laby.framework.xxx`
+   - 配置类：`LabyXxxAutoConfiguration`（必须以 Laby 开头）
+
+2. **依赖管理**
+   - 必须依赖 `laby-common`
+   - 其他依赖按需添加，避免引入过多依赖
+   - 使用 `<scope>provided</scope>` 标记可选依赖
+
+3. **注释要求**
+   - 所有公开类、接口、方法必须添加详细注释
+   - 私有方法也要添加简单注释
+   - 复杂逻辑必须分步骤说明
+
+4. **日志规范**
+   - 使用 `@Slf4j` 注解
+   - 初始化时打印 info 日志
+   - 关键操作打印 debug 日志
+   - 异常时打印 error 日志
+
+5. **代码质量**
+   - 遵循阿里巴巴 Java 开发规范
+   - 使用 Lombok 简化代码
+   - 使用 Hutool 工具类
+   - 编写单元测试
+
+---
+
+## 五、开发流程规范
+
+### 5.1 新增模块开发流程
+
+1. **数据库设计**
+   - 创建表结构（`wms_init.sql`）
+   - 定义字典数据（`wms_dict.sql`）
+   - 配置菜单权限（`wms_menu.sql`）
+   - 生成测试数据（`wms_test_data.sql`）
+
+2. **后端开发（按顺序）**
+   - ① 创建 DO（`XxxDO.java`）
+   - ② 创建 Mapper（`XxxMapper.java`）
+   - ③ 创建 VO（`XxxSaveReqVO.java`、`XxxRespVO.java`、`XxxPageReqVO.java`）
+   - ④ 创建 Convert（`XxxConvert.java`）
+   - ⑤ 创建 Service（`XxxService.java`、`XxxServiceImpl.java`）
+   - ⑥ 创建 Controller（`XxxController.java`）
+   - ⑦ 添加错误码（`ErrorCodeConstants.java`）
+
+3. **前端开发（按顺序）**
+   - ① 定义 API（`xxx.ts`）
+   - ② 创建列表页（`index.vue`）
+   - ③ 创建表单组件（`XxxForm.vue`）
+   - ④ 添加字典类型（`dict.ts`）
+
+4. **测试验证**
+   - 执行 SQL 脚本初始化数据
+   - 启动后端服务
+   - 启动前端服务
+   - 测试 CRUD 功能
+   - 检查权限控制
+   - 检查数据关联
+
+### 5.2 代码注释规范
+
+**Java 注释：**
+```java
+/**
+ * 类或接口注释
+ * 说明类的职责和功能
+ *
+ * @author laby
+ */
+public class XxxService {
+
+    /**
+     * 方法注释
+     * 说明方法的功能、参数、返回值
+     *
+     * @param id 商品ID
+     * @return 商品详情
+     */
+    GoodsRespVO getGoods(Long id);
+}
+```
+
+**TypeScript/Vue 注释：**
+```typescript
+/**
+ * 文件注释
+ * 
+ * @author laby
+ * @description 说明文件功能
+ */
+
+/**
+ * 函数注释
+ * 
+ * @param id 商品ID
+ * @returns 商品详情
+ */
+export const getGoods = (id: number) => {
+  // ...
+}
+```
+
+**关键规则：**
+- ✅ **所有类、接口、方法、函数必须添加注释**
+- ✅ 注释必须说明功能、参数、返回值
+- ✅ 字段注释必须说明含义、示例、取值范围
+- ✅ 使用中文注释
+
+---
+
+## 六、常见错误及解决方案
+
+### 6.1 字典类型错误
+
+**❌ 错误写法：**
+```java
+// 数据库
+`unit` VARCHAR(20) DEFAULT 'PCS'
+
+// 字典数据
+INSERT INTO system_dict_data (value, dict_type) VALUES ('PCS', 'wms_goods_unit');
+
+// 前端
+<el-option
+  v-for="dict in getStrDictOptions(DICT_TYPE.WMS_GOODS_UNIT)"
+  :value="dict.value"
+/>
+```
+
+**✅ 正确写法：**
+```java
+// 数据库
+`unit` TINYINT(4) DEFAULT 1 COMMENT '计量单位（字典：wms_goods_unit）：1-个，2-箱'
+
+// 字典数据
+INSERT INTO system_dict_data (value, dict_type) VALUES ('1', 'wms_goods_unit');
+
+// DO
+private Integer unit;
+
+// 前端
+<el-option
+  v-for="dict in getIntDictOptions(DICT_TYPE.WMS_GOODS_UNIT)"
+  :value="dict.value"
+/>
+```
+
+### 6.2 数据关联错误
+
+**❌ 错误写法（Mapper 直接返回 VO）：**
+```java
+// Mapper
+@Mapper
+public interface GoodsMapper {
+    // ❌ 禁止：Mapper 返回 VO
+    PageResult<GoodsRespVO> selectPageWithCategory(GoodsPageReqVO reqVO);
+}
+```
+
+**✅ 正确写法（Service 层关联）：**
+```java
+// Mapper：只返回 DO
+default PageResult<GoodsDO> selectPage(GoodsPageReqVO reqVO) {
+    return selectPage(reqVO, new LambdaQueryWrapperX<GoodsDO>()
+            .likeIfPresent(GoodsDO::getGoodsName, reqVO.getGoodsName())
+            .orderByDesc(GoodsDO::getId));
+}
+
+// Service：负责关联和转换
+public PageResult<GoodsRespVO> getGoodsPage(GoodsPageReqVO pageReqVO) {
+    // 1. Mapper 查询 DO
+    PageResult<GoodsDO> pageResult = goodsMapper.selectPage(pageReqVO);
+    
+    // 2. 提取关联ID
+    Set<Long> categoryIds = convertSet(pageResult.getList(), GoodsDO::getCategoryId);
+    
+    // 3. 批量查询关联数据
+    Map<Long, String> categoryMap = goodsCategoryService.getGoodsCategoryMap(categoryIds);
+    
+    // 4. 转换 VO 并填充关联字段
+    return GoodsConvert.INSTANCE.convertPage(pageResult, categoryMap);
+}
+```
+
+### 6.3 权限标识错误
+
+**❌ 错误写法：**
+```java
+// 后端
+@PreAuthorize("@ss.hasPermission('wms:goods-info:create')")
+
+// 前端
+v-hasPermi="['wms:goods_info:create']"
+
+// 数据库
+permission = 'wms:goodsInfo:create'
+```
+
+**✅ 正确写法（统一格式）：**
+```java
+// 后端
+@PreAuthorize("@ss.hasPermission('wms:goods:create')")
+
+// 前端
+v-hasPermi="['wms:goods:create']"
+
+// 数据库
+permission = 'wms:goods:create'
+```
+
+---
+
+## 七、核心原则总结
+
+### 7.1 必须遵守的规则（不可违反）
+
+1. ✅ **字典字段必须使用 `TINYINT(4)` 和整数值**
+2. ✅ **Mapper 只能返回 DO，不能返回 VO**
+3. ✅ **数据关联在 Service 层完成，不在 Mapper 层**
+4. ✅ **权限标识统一格式：`wms:模块名:操作`**
+5. ✅ **前端字典必须使用 `getIntDictOptions`**
+6. ✅ **所有类、方法、函数必须添加详细注释**
+7. ✅ **DO 必须继承 BaseDO**
+8. ✅ **表结构必须包含：creator、create_time、updater、update_time、deleted**
+
+### 7.2 推荐的最佳实践
+
+1. ✅ 使用 MapStruct 进行对象转换
+2. ✅ 使用 `LambdaQueryWrapperX` 构建查询条件
+3. ✅ 批量关联查询使用 Map 方式
+4. ✅ 删除操作前进行二次确认
+5. ✅ 表单提交前进行数据校验
+6. ✅ 错误提示使用国际化
+7. ✅ 长文本使用 `show-overflow-tooltip`
+8. ✅ 定期执行 `mvn clean compile` 检查编译错误
+
+---
+
+## 八、快速参考
+
+### 8.1 常用命令
+
+```bash
+# 后端编译
+mvn clean compile
+
+# 后端启动
+mvn spring-boot:run
+
+# 前端启动
+cd laby-ui
+npm run dev
+
+# 类型检查
+npm run type-check
+```
+
+### 8.2 常用注解
+
+```java
+// 后端
+@RestController              // Controller 类
+@RequestMapping("/wms/xxx")  // 路径映射
+@PreAuthorize("@ss.hasPermission('wms:xxx:xxx')") // 权限控制
+@Validated                   // 启用参数校验
+@Valid                       // 校验参数
+@Resource                    // 依赖注入
+
+// 前端
+v-hasPermi="['wms:xxx:xxx']"  // 权限控制
+v-loading="loading"           // 加载状态
+@keyup.enter="handleQuery"    // 回车搜索
+```
+
+### 8.3 目录结构速查
+
+```
+后端：laby-module-wms/src/main/java/com/laby/module/wms/
+      ├── controller/admin/xxx/
+      ├── dal/dataobject/xxx/ + dal/mysql/xxx/
+      ├── service/xxx/
+      ├── convert/xxx/
+      └── enums/
+
+前端：laby-ui/src/
+      ├── api/wms/
+      └── views/wms/xxx/
+```
+
+---
+
+**最后提醒：开发时严格遵循本规范，代码风格统一，提高代码质量和可维护性！** 🎯

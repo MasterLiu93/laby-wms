@@ -1,0 +1,648 @@
+// ==================== iOS 风格主题 - Element Plus 组件定制 ====================
+// 只修改颜色、字体、圆角等视觉样式，不改动尺寸、动画和渲染效果
+@use './css-variables' as *;
+
+// ==================== 全局基础样式 ====================
+* {
+  font-family: monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// ==================== Button 按钮组件 ====================
+// 只修改颜色，使用 Element Plus 原始样式
+.el-button {
+  font-family: monospace;
+}
+
+// ==================== Input 输入框组件 ====================
+.el-input {
+  font-family: monospace;
+
+  &__wrapper {
+    background: rgba(142, 142, 147, 0.12);
+    border-color: transparent;
+
+    &:hover {
+      background: rgba(142, 142, 147, 0.16);
+    }
+
+    &.is-focus {
+      background: rgba(142, 142, 147, 0.08);
+      border-color: var(--ios-color-primary);
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+    }
+  }
+
+  &__inner {
+    font-family: monospace;
+    color: var(--ios-text-primary);
+    background: transparent;
+
+    &::placeholder {
+      color: var(--ios-text-tertiary);
+    }
+  }
+
+  &__prefix,
+  &__suffix {
+    color: var(--ios-text-tertiary);
+  }
+}
+
+// ==================== Select 选择器组件 ====================
+.el-select {
+  font-family: monospace;
+
+  .el-select__caret {
+    color: var(--ios-text-tertiary);
+  }
+}
+
+.el-select-dropdown {
+  background: var(--ios-bg-secondary);
+  border: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+
+  .el-select-dropdown__item {
+    font-family: monospace;
+    color: var(--ios-text-primary);
+
+    &:hover {
+      background: rgba(142, 142, 147, 0.12);
+    }
+
+    &.selected {
+      color: var(--ios-color-primary);
+      background: rgba(0, 122, 255, 0.1);
+    }
+  }
+}
+
+// ==================== Radio 单选框组件 ====================
+.el-radio {
+  font-family: monospace;
+  color: var(--ios-text-primary);
+
+  &__input {
+    .el-radio__inner {
+      border-color: rgba(142, 142, 147, 0.4);
+      background: transparent;
+    }
+
+    &.is-checked {
+      .el-radio__inner {
+        border-color: var(--ios-color-primary);
+        background: var(--ios-color-primary);
+
+        &::after {
+          background: #ffffff;
+        }
+      }
+    }
+  }
+
+  &__label {
+    color: var(--ios-text-primary);
+  }
+}
+
+// ==================== Checkbox 复选框组件 ====================
+.el-checkbox {
+  font-family: monospace;
+  color: var(--ios-text-primary);
+
+  &__input {
+    .el-checkbox__inner {
+      border-color: rgba(142, 142, 147, 0.4);
+      background: transparent;
+    }
+
+    &.is-checked {
+      .el-checkbox__inner {
+        border-color: var(--ios-color-primary);
+        background: var(--ios-color-primary);
+      }
+    }
+
+    &.is-indeterminate {
+      .el-checkbox__inner {
+        border-color: var(--ios-color-primary);
+        background: var(--ios-color-primary);
+      }
+    }
+  }
+
+  &__label {
+    color: var(--ios-text-primary);
+  }
+}
+
+// ==================== Switch 开关组件 ====================
+.el-switch {
+  &__core {
+    background: rgba(142, 142, 147, 0.3);
+    border: none;
+  }
+
+  &.is-checked {
+    .el-switch__core {
+      background: var(--ios-color-primary);
+    }
+  }
+}
+
+// ==================== Dialog 对话框组件 ====================
+.el-dialog {
+  background: var(--ios-bg-secondary);
+  border: none;
+  font-family: monospace;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+
+  &__header {
+    background: transparent;
+    border-bottom: 0.5px solid rgba(142, 142, 147, 0.2);
+  }
+
+  &__title {
+    font-family: monospace;
+    color: var(--ios-text-primary);
+    font-weight: var(--ios-font-weight-semibold);
+  }
+
+  &__headerbtn {
+    border-radius: 50%;
+    transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+      background: rgba(142, 142, 147, 0.12);
+    }
+
+    .el-dialog__close {
+      color: var(--ios-text-tertiary);
+      transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+      &:hover {
+        color: var(--ios-text-primary);
+      }
+    }
+  }
+
+  &__body {
+    font-family: monospace;
+    color: var(--ios-text-primary);
+    background: transparent;
+  }
+
+  &__footer {
+    background: transparent;
+    border-top: 0.5px solid rgba(142, 142, 147, 0.2);
+  }
+}
+
+.el-overlay {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+}
+
+// ==================== Message 消息提示组件 ====================
+.el-message {
+  font-family: monospace;
+  border: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+
+  &--success {
+    background: rgba(52, 199, 89, 0.95);
+    color: #ffffff;
+  }
+
+  &--warning {
+    background: rgba(255, 149, 0, 0.95);
+    color: #ffffff;
+  }
+
+  &--error {
+    background: rgba(255, 59, 48, 0.95);
+    color: #ffffff;
+  }
+
+  &--info {
+    background: rgba(0, 122, 255, 0.95);
+    color: #ffffff;
+  }
+}
+
+// ==================== Notification 通知组件 ====================
+.el-notification {
+  font-family: monospace;
+  background: var(--ios-bg-secondary);
+  border: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+
+  &__title {
+    font-family: monospace;
+    color: var(--ios-text-primary);
+  }
+
+  &__content {
+    font-family: monospace;
+    color: var(--ios-text-secondary);
+  }
+}
+
+// ==================== Loading 加载组件 ====================
+.el-loading-mask {
+  background: rgba(255, 255, 255, 0.8);
+
+  .el-loading-spinner {
+    .path {
+      stroke: var(--ios-color-primary);
+    }
+  }
+}
+
+.dark .el-loading-mask {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+// ==================== Table 表格组件 ====================
+.el-table {
+  font-family: monospace;
+  background: var(--ios-bg-secondary);
+  border-color: rgba(142, 142, 147, 0.2);
+
+  &__header {
+    background: rgba(142, 142, 147, 0.06);
+
+    th {
+      background: transparent;
+      color: var(--ios-text-secondary);
+      font-weight: var(--ios-font-weight-semibold);
+      border-bottom-color: rgba(142, 142, 147, 0.2);
+      transition: background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+
+      &:hover {
+        background: rgba(142, 142, 147, 0.08);
+      }
+    }
+  }
+
+  &__body {
+    tr {
+      transition: background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+
+      &:hover {
+        background: rgba(142, 142, 147, 0.06);
+      }
+
+      td {
+        color: var(--ios-text-primary);
+        border-bottom-color: rgba(142, 142, 147, 0.1);
+      }
+    }
+  }
+
+  &--striped {
+    .el-table__body {
+      tr.el-table__row--striped {
+        background: rgba(142, 142, 147, 0.04);
+      }
+
+      tr.el-table__row--striped:hover {
+        background: rgba(142, 142, 147, 0.08);
+      }
+    }
+  }
+
+  // 表格边框优化
+  &__border {
+    border-color: rgba(142, 142, 147, 0.2);
+
+    &::after {
+      background-color: rgba(142, 142, 147, 0.2);
+    }
+  }
+
+  // 固定列阴影优化
+  &__fixed,
+  &__fixed-right {
+    &::before {
+      background-color: rgba(142, 142, 147, 0.08);
+    }
+  }
+
+  // 空状态
+  .el-table__empty-block {
+    background: transparent;
+    color: var(--ios-text-tertiary);
+  }
+
+  // 排序图标
+  .caret-wrapper {
+    .sort-caret {
+      &.ascending {
+        border-bottom-color: var(--ios-color-primary);
+      }
+
+      &.descending {
+        border-top-color: var(--ios-color-primary);
+      }
+    }
+  }
+}
+
+// ==================== Card 卡片组件 ====================
+.el-card {
+  background: var(--ios-bg-secondary);
+  border: none;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+
+  &__header {
+    background: transparent;
+    border-bottom: 0.5px solid rgba(142, 142, 147, 0.2);
+    font-family: monospace;
+    color: var(--ios-text-primary);
+  }
+
+  &__body {
+    background: transparent;
+    font-family: monospace;
+    color: var(--ios-text-primary);
+  }
+}
+
+// ==================== Tag 标签组件 ====================
+.el-tag {
+  font-family: monospace;
+  border: none;
+
+  &--primary {
+    background: rgba(0, 122, 255, 0.12);
+    color: var(--ios-color-primary);
+  }
+
+  &--success {
+    background: rgba(52, 199, 89, 0.12);
+    color: var(--ios-color-success);
+  }
+
+  &--warning {
+    background: rgba(255, 149, 0, 0.12);
+    color: var(--ios-color-warning);
+  }
+
+  &--danger {
+    background: rgba(255, 59, 48, 0.12);
+    color: var(--ios-color-danger);
+  }
+
+  &--info {
+    background: rgba(90, 200, 250, 0.12);
+    color: var(--ios-color-info);
+  }
+}
+
+// ==================== Menu 菜单组件 ====================
+.el-menu {
+  font-family: monospace;
+  background: transparent;
+  border: none;
+
+  &-item {
+    color: var(--ios-text-primary);
+
+    &:hover {
+      background: rgba(142, 142, 147, 0.12);
+      color: var(--ios-color-primary);
+    }
+
+    &.is-active {
+      background: rgba(0, 122, 255, 0.12);
+      color: var(--ios-color-primary);
+    }
+  }
+
+  &-item-group__title {
+    color: var(--ios-text-tertiary);
+  }
+}
+
+// ==================== Tabs 标签页组件 ====================
+.el-tabs {
+  font-family: monospace;
+
+  &__nav-wrap {
+    &::after {
+      background: rgba(142, 142, 147, 0.2);
+    }
+  }
+
+  &__item {
+    color: var(--ios-text-secondary);
+
+    &:hover {
+      color: var(--ios-color-primary);
+    }
+
+    &.is-active {
+      color: var(--ios-color-primary);
+    }
+  }
+
+  &__active-bar {
+    background: var(--ios-color-primary);
+  }
+}
+
+// ==================== Pagination 分页组件 ====================
+.el-pagination {
+  font-family: monospace;
+
+  .el-pager {
+    li {
+      &:hover {
+        color: var(--ios-color-primary);
+        background: rgba(142, 142, 147, 0.12);
+      }
+
+      &.is-active {
+        background: var(--ios-color-primary);
+        color: #ffffff;
+      }
+    }
+  }
+
+  .btn-prev,
+  .btn-next {
+    &:hover {
+      color: var(--ios-color-primary);
+      background: rgba(142, 142, 147, 0.12);
+    }
+  }
+}
+
+// ==================== Form 表单组件 ====================
+.el-form {
+  font-family: monospace;
+
+  &-item {
+    // 确保 form-item 有足够的空间
+    margin-bottom: 22px;
+
+    &__label {
+      font-family: monospace;
+      color: var(--ios-text-primary);
+      // 确保 label 换行时垂直居中
+      display: flex;
+      align-items: center;
+      // 防止 label 超出区域
+      word-wrap: break-word;
+      white-space: normal;
+      line-height: 1.5 !important;
+      // 移除固定的高度和行高，允许自适应
+      height: auto !important;
+      min-height: auto;
+      // 防止压盖到下面
+      overflow: visible;
+      // 确保 label 区域不会溢出
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+
+    // 覆盖 Element Plus 默认的 line-height: 32px
+    &--default {
+      .el-form-item__label {
+        line-height: 1.5 !important;
+        height: auto !important;
+      }
+    }
+
+    &__content {
+      // 确保内容区域有足够的空间
+      min-height: auto;
+    }
+
+    &__error {
+      font-family: monospace;
+      color: var(--ios-color-danger);
+      // 确保错误信息不会与 label 重叠
+      margin-top: 4px;
+      display: block;
+      line-height: 1.4;
+    }
+  }
+
+  // 当 label 在左侧时，确保对齐
+  &--label-left {
+    .el-form-item__label {
+      justify-content: flex-start;
+      text-align: left;
+    }
+  }
+
+  // 当 label 在右侧时
+  &--label-right {
+    .el-form-item__label {
+      justify-content: flex-end;
+      text-align: right;
+    }
+  }
+
+  // 当 label 在顶部时
+  &--label-top {
+    .el-form-item {
+      margin-bottom: 18px;
+    }
+
+    .el-form-item__label {
+      justify-content: flex-start;
+      text-align: left;
+      padding-bottom: 8px;
+      align-items: flex-start;
+    }
+  }
+
+  // 内联表单（通常用于搜索/筛选表单）
+  &--inline {
+    // 为整个表单添加内边距
+    padding: 20px;
+    background: var(--ios-bg-secondary);
+    border-radius: 12px;
+
+    .el-form-item {
+      // 增加表单项之间的间距
+      margin-right: 20px;
+      margin-bottom: 16px;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+
+    // 按钮区域添加间距
+    .el-form-item:has(.el-button) {
+      margin-left: 8px;
+    }
+  }
+}
+
+// ==================== 表格检索表单特殊样式 ====================
+// 针对搜索/筛选表单的容器
+.v-form,
+.search-form,
+.filter-form {
+  padding: 20px;
+  background: var(--ios-bg-secondary);
+  border-radius: 12px;
+  margin-bottom: 16px;
+
+  .el-form {
+    &--inline {
+      .el-form-item {
+        margin-right: 20px;
+        margin-bottom: 16px;
+
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+    }
+  }
+
+  // 按钮组间距
+  .el-button + .el-button {
+    margin-left: 12px;
+  }
+}
+
+// ==================== Slider 滑块组件 ====================
+.el-slider {
+  &__runway {
+    background: rgba(142, 142, 147, 0.2);
+  }
+
+  &__bar {
+    background: var(--ios-color-primary);
+  }
+
+  &__button {
+    border-color: var(--ios-color-primary);
+  }
+}
+
+// ==================== 暗色模式优化 ====================
+.dark {
+  .el-card {
+    background: var(--ios-bg-secondary);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .el-table {
+    background: var(--ios-bg-secondary);
+    border-color: rgba(142, 142, 147, 0.3);
+  }
+
+  .el-input__wrapper {
+    background: rgba(142, 142, 147, 0.16);
+  }
+}
