@@ -111,22 +111,22 @@
     </div>
     
     <el-table v-loading="loading" :data="list" stripe>
-      <el-table-column v-if="columns.carrierCode.visible" :label="t('wms.carrierCode')" prop="carrierCode" width="140" show-overflow-tooltip />
+      <el-table-column v-if="columns.carrierCode.visible" :label="t('wms.carrierCode')" prop="carrierCode" min-width="120" show-overflow-tooltip />
       <el-table-column v-if="columns.carrierName.visible" :label="t('wms.carrierName')" prop="carrierName" min-width="160" show-overflow-tooltip />
       
-      <el-table-column v-if="columns.carrierType.visible" :label="t('wms.carrierType')" prop="carrierType" width="110" align="center">
+      <el-table-column v-if="columns.carrierType.visible" :label="t('wms.carrierType')" prop="carrierType" min-width="120" show-overflow-tooltip align="center">
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_CARRIER_TYPE" :value="scope.row.carrierType" />
         </template>
       </el-table-column>
       
-      <el-table-column v-if="columns.contactPerson.visible" :label="t('wms.contactPerson')" prop="contactPerson" width="100" show-overflow-tooltip />
-      <el-table-column v-if="columns.contactPhone.visible" :label="t('wms.contactPhone')" prop="contactPhone" width="130" show-overflow-tooltip />
+      <el-table-column v-if="columns.contactPerson.visible" :label="t('wms.contactPerson')" prop="contactPerson" min-width="120" show-overflow-tooltip />
+      <el-table-column v-if="columns.contactPhone.visible" :label="t('wms.contactPhone')" prop="contactPhone" min-width="120" show-overflow-tooltip />
       
       <el-table-column v-if="columns.serviceArea.visible" :label="t('wms.serviceArea')" prop="serviceArea" min-width="150" show-overflow-tooltip />
       <el-table-column v-if="columns.timeLimit.visible" :label="t('wms.timeLimit')" prop="timeLimit" min-width="160" show-overflow-tooltip />
       
-      <el-table-column v-if="columns.rating.visible" :label="t('wms.rating')" prop="rating" width="100" align="center">
+      <el-table-column v-if="columns.rating.visible" :label="t('wms.rating')" prop="rating" min-width="120" show-overflow-tooltip align="center">
         <template #default="scope">
           <el-rate
             v-model="scope.row.rating"
@@ -138,13 +138,13 @@
         </template>
       </el-table-column>
       
-      <el-table-column v-if="columns.cooperationStartDate.visible" :label="t('wms.cooperationDate')" prop="cooperationStartDate" width="110" align="center">
+      <el-table-column v-if="columns.cooperationStartDate.visible" :label="t('wms.cooperationDate')" prop="cooperationStartDate" min-width="120" show-overflow-tooltip align="center">
         <template #default="scope">
           {{ formatCooperationDate(scope.row.cooperationStartDate) }}
         </template>
       </el-table-column>
       
-      <el-table-column v-if="columns.status.visible" :label="t('wms.status')" prop="status" width="80" align="center">
+      <el-table-column v-if="columns.status.visible" :label="t('wms.status')" prop="status" min-width="120" align="center">
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
         </template>
@@ -154,12 +154,13 @@
         v-if="columns.createTime.visible"
         :label="t('common.createTime')"
         prop="createTime"
-        width="160"
+        min-width="120"
+        show-overflow-tooltip
         align="center"
         :formatter="dateFormatter"
              />
       
-      <el-table-column :label="t('action.action')" fixed="right" width="160" align="center">
+      <el-table-column :label="t('action.action')" fixed="right" min-width="200" show-overflow-tooltip align="center">
         <template #default="scope">
           <el-button
             link

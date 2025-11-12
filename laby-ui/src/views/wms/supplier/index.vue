@@ -135,20 +135,23 @@
         :label="t('wms.supplierCode')" 
         align="center" 
         prop="supplierCode" 
-        width="150px" 
+        min-width="120" 
+        show-overflow-tooltip
       />
       <el-table-column 
         v-if="columns.supplierName.visible" 
         :label="t('wms.supplierName')" 
         align="center" 
         prop="supplierName" 
-        min-width="200px" 
+        min-width="120" 
+        show-overflow-tooltip
       />
       <el-table-column 
         v-if="columns.supplierType.visible" 
         :label="t('wms.supplierType')" 
         align="center" 
-        width="120px"
+        min-width="120"
+        show-overflow-tooltip
       >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_SUPPLIER_TYPE" :value="scope.row.supplierType" />
@@ -158,13 +161,17 @@
         v-if="columns.contactPerson.visible" 
         :label="t('wms.contactPerson')" 
         align="center" 
-        width="100px"
+        prop="contactPerson"
+        min-width="120"
+        show-overflow-tooltip
       />
       <el-table-column 
         v-if="columns.contactPhone.visible" 
         :label="t('wms.contactPhone')" 
+        align="center"
         prop="contactPhone" 
-        width="120" 
+        min-width="120" 
+        show-overflow-tooltip
       />
       <el-table-column 
         v-if="columns.provinceCityDistrict.visible" 
@@ -187,7 +194,8 @@
         v-if="columns.creditLevel.visible" 
         :label="t('wms.creditLevel')" 
         align="center" 
-        width="100px"
+        min-width="120"
+        show-overflow-tooltip
       >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_SUPPLIER_CREDIT_LEVEL" :value="scope.row.creditLevel" />
@@ -196,8 +204,10 @@
       <el-table-column 
         v-if="columns.cooperationStartDate.visible" 
         :label="t('wms.cooperationStartDate')" 
+        align="center"
         prop="cooperationStartDate" 
-        width="120px"
+        min-width="120"
+        show-overflow-tooltip
       >
         <template #default="scope">
           {{ formatCooperationDate(scope.row.cooperationStartDate) }}
@@ -208,7 +218,8 @@
         :label="t('common.status')" 
         align="center" 
         prop="status" 
-        width="80px"
+        min-width="120"
+        show-overflow-tooltip
       >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
@@ -219,10 +230,11 @@
         :label="t('common.createTime')" 
         align="center" 
         prop="createTime" 
-        width="180px" 
+        min-width="120" 
         :formatter="dateFormatter" 
+        show-overflow-tooltip
       />
-      <el-table-column :label="t('action.action')" fixed="right" width="150">
+      <el-table-column :label="t('action.action')" align="center" fixed="right" min-width="200" show-overflow-tooltip>
         <template #default="scope">
           <el-button link type="primary" @click="openForm('update', scope.row.id)" v-hasPermi="['wms:supplier:update']">
             {{ t('action.edit') }}

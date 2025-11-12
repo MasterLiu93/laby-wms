@@ -142,7 +142,8 @@
         v-if="columns.customerType.visible" 
         :label="t('wms.customerType')" 
         prop="customerType" 
-        width="150"
+        min-width="120"
+        show-overflow-tooltip
       >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_CUSTOMER_TYPE" :value="scope.row.customerType" />
@@ -152,7 +153,8 @@
         v-if="columns.customerLevel.visible" 
         :label="t('wms.customerLevel')" 
         prop="customerLevel" 
-        width="150"
+        min-width="120"
+        show-overflow-tooltip
       >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_CUSTOMER_LEVEL" :value="scope.row.customerLevel" />
@@ -162,14 +164,14 @@
         v-if="columns.contactPerson.visible" 
         :label="t('wms.contactPerson')" 
         prop="contactPerson" 
-        width="100" 
+        min-width="120" 
         show-overflow-tooltip 
       />
       <el-table-column 
         v-if="columns.contactPhone.visible" 
         :label="t('wms.contactPhone')" 
         prop="contactPhone" 
-        width="130" 
+        min-width="120" 
         show-overflow-tooltip 
       />
       <el-table-column 
@@ -186,7 +188,8 @@
         v-if="columns.creditLimit.visible" 
         :label="t('wms.creditLimit')" 
         prop="creditLimit" 
-        width="110" 
+        min-width="120"
+        show-overflow-tooltip 
         align="right"
       >
         <template #default="scope">
@@ -197,14 +200,16 @@
         v-if="columns.totalOrders.visible" 
         :label="t('wms.totalOrders')" 
         prop="totalOrders" 
-        width="90" 
+        min-width="120"
+        show-overflow-tooltip 
         align="right" 
       />
       <el-table-column 
         v-if="columns.totalAmount.visible" 
         :label="t('wms.totalAmount')" 
         prop="totalAmount" 
-        width="180" 
+        min-width="120"
+        show-overflow-tooltip 
         align="right"
       >
         <template #default="scope">
@@ -215,7 +220,8 @@
         v-if="columns.status.visible" 
         :label="t('common.status')" 
         prop="status" 
-        width="80"
+        min-width="120"
+        show-overflow-tooltip
       >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
@@ -225,10 +231,11 @@
         v-if="columns.createTime.visible" 
         :label="t('common.createTime')" 
         prop="createTime" 
-        width="160" 
+        min-width="120"
+        show-overflow-tooltip 
         :formatter="dateFormatter" 
       />
-      <el-table-column :label="t('action.action')" fixed="right" width="150">
+      <el-table-column :label="t('action.action')" align="center" fixed="right" min-width="200" show-overflow-tooltip>
         <template #default="scope">
           <el-button link type="primary" @click="openForm('update', scope.row.id)" v-hasPermi="['wms:customer:update']">
             {{ t('action.edit') }}

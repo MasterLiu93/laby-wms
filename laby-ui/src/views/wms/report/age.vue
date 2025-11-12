@@ -148,21 +148,21 @@
     </div>
     
     <el-table v-loading="loading" :data="list">
-      <el-table-column v-if="columns.goodsCode.visible" :label="t('wms.goodsCode')" align="center" prop="goodsCode" width="120" />
+      <el-table-column v-if="columns.goodsCode.visible" :label="t('wms.goodsCode')" align="center" prop="goodsCode" min-width="120" show-overflow-tooltip />
       <el-table-column v-if="columns.goodsName.visible" :label="t('wms.goodsName')" align="center" prop="goodsName" min-width="150" />
-      <el-table-column v-if="columns.warehouseName.visible" :label="t('wms.warehouse')" align="center" prop="warehouseName" width="120" />
-      <el-table-column v-if="columns.locationCode.visible" :label="t('wms.location')" align="center" prop="locationCode" width="100" />
-      <el-table-column v-if="columns.batchNo.visible" :label="t('wms.batchNo')" align="center" prop="batchNo" width="120" />
-      <el-table-column v-if="columns.quantity.visible" :label="t('wms.quantity')" align="center" prop="quantity" width="100" />
-      <el-table-column v-if="columns.inboundDate.visible" :label="t('wms.inboundDate')" align="center" prop="inboundDate" width="120" />
-      <el-table-column v-if="columns.age.visible" :label="t('wms.age')" align="center" prop="age" width="100">
+      <el-table-column v-if="columns.warehouseName.visible" :label="t('wms.warehouse')" align="center" prop="warehouseName" min-width="120" show-overflow-tooltip />
+      <el-table-column v-if="columns.locationCode.visible" :label="t('wms.location')" align="center" prop="locationCode" min-width="120" show-overflow-tooltip />
+      <el-table-column v-if="columns.batchNo.visible" :label="t('wms.batchNo')" align="center" prop="batchNo" min-width="120" show-overflow-tooltip />
+      <el-table-column v-if="columns.quantity.visible" :label="t('wms.quantity')" align="center" prop="quantity" min-width="120" show-overflow-tooltip />
+      <el-table-column v-if="columns.inboundDate.visible" :label="t('wms.inboundDate')" align="center" prop="inboundDate" min-width="120" show-overflow-tooltip />
+      <el-table-column v-if="columns.age.visible" :label="t('wms.age')" align="center" prop="age" min-width="120" show-overflow-tooltip>
         <template #default="{ row }">
           <el-tag :type="getAgeType(row.age)">
             {{ row.age }} {{ t('wms.days') }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column v-if="columns.ageLevel.visible" :label="t('wms.ageLevel')" align="center" prop="ageLevel" width="100">
+      <el-table-column v-if="columns.ageLevel.visible" :label="t('wms.ageLevel')" align="center" prop="ageLevel" min-width="120" show-overflow-tooltip>
         <template #default="{ row }">
           <el-tag :type="getAgeLevelType(row.ageLevel)">
             {{ getAgeLevelText(row.ageLevel) }}

@@ -80,38 +80,38 @@
     </div>
     
     <el-table v-loading="loading" :data="list">
-      <el-table-column v-if="columns.planNo.visible" :label="t('wms.planNo')" prop="planNo" width="160" align="center" />
+      <el-table-column v-if="columns.planNo.visible" :label="t('wms.planNo')" prop="planNo" min-width="120" show-overflow-tooltip align="center" />
       <el-table-column v-if="columns.planName.visible" :label="t('wms.planName')" prop="planName" min-width="180" show-overflow-tooltip />
-      <el-table-column v-if="columns.warehouseName.visible" :label="t('wms.warehouse')" prop="warehouseName" width="120" align="center" />
-      <el-table-column v-if="columns.takingType.visible" :label="t('wms.takingType')" prop="takingType" width="100" align="center">
+      <el-table-column v-if="columns.warehouseName.visible" :label="t('wms.warehouse')" prop="warehouseName" min-width="120" show-overflow-tooltip align="center" />
+      <el-table-column v-if="columns.takingType.visible" :label="t('wms.takingType')" prop="takingType" min-width="120" show-overflow-tooltip align="center">
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_STOCK_TAKING_TYPE" :value="scope.row.takingType" />
         </template>
       </el-table-column>
-      <el-table-column v-if="columns.scopeType.visible" :label="t('wms.scopeType')" prop="scopeType" width="100" align="center">
+      <el-table-column v-if="columns.scopeType.visible" :label="t('wms.scopeType')" prop="scopeType" min-width="120" show-overflow-tooltip align="center">
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_STOCK_TAKING_SCOPE_TYPE" :value="scope.row.scopeType" />
         </template>
       </el-table-column>
-      <el-table-column v-if="columns.planTime.visible" :label="t('wms.planTime')" width="180" align="center">
+      <el-table-column v-if="columns.planTime.visible" :label="t('wms.planTime')" min-width="120" show-overflow-tooltip align="center">
         <template #default="scope">
           <div>{{ formatDate(scope.row.planStartTime) }}</div>
           <div>{{ t('wms.planTimeTo') }} {{ formatDate(scope.row.planEndTime) }}</div>
         </template>
       </el-table-column>
-      <el-table-column v-if="columns.progress.visible" :label="t('wms.progress')" width="120" align="center">
+      <el-table-column v-if="columns.progress.visible" :label="t('wms.progress')" min-width="120" show-overflow-tooltip align="center">
         <template #default="scope">
           {{ scope.row.completedCount || 0 }} / {{ scope.row.totalCount || 0 }}
         </template>
       </el-table-column>
-      <el-table-column v-if="columns.diffCount.visible" :label="t('wms.diffCount')" prop="diffCount" width="80" align="center" />
-      <el-table-column v-if="columns.status.visible" :label="t('wms.status')" prop="status" width="100" align="center" show-overflow-tooltip>
+      <el-table-column v-if="columns.diffCount.visible" :label="t('wms.diffCount')" prop="diffCount" min-width="120" show-overflow-tooltip align="center" />
+      <el-table-column v-if="columns.status.visible" :label="t('wms.status')" prop="status" min-width="120" show-overflow-tooltip align="center">
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_STOCK_TAKING_PLAN_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
-      <el-table-column v-if="columns.createTime.visible" :label="t('common.createTime')" prop="createTime" width="160" align="center" :formatter="dateFormatter" />
-      <el-table-column :label="t('action.action')" fixed="right" width="200" align="center">
+      <el-table-column v-if="columns.createTime.visible" :label="t('common.createTime')" prop="createTime" min-width="120" show-overflow-tooltip align="center" :formatter="dateFormatter" />
+      <el-table-column :label="t('action.action')" fixed="right" min-width="200" show-overflow-tooltip align="center">
         <template #default="scope">
           <el-button link type="primary" @click="openForm('update', scope.row.id)" v-hasPermi="['wms:stocktaking-plan:update']" v-if="scope.row.status === 1">
             {{ t('action.edit') }}

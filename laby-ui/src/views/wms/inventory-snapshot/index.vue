@@ -64,31 +64,31 @@
       <RightToolbar v-model:showSearch="showSearch" :search="true" @queryTable="getList" />
     </div>
     <el-table v-loading="loading" :data="list" stripe>
-      <el-table-column :label="t('wms.snapshotDate')" prop="snapshotDate" width="120" fixed="left" />
-      <el-table-column :label="t('wms.warehouse')" prop="warehouseName" width="120" />
+      <el-table-column :label="t('wms.snapshotDate')" prop="snapshotDate" min-width="120" show-overflow-tooltip fixed="left" />
+      <el-table-column :label="t('wms.warehouse')" prop="warehouseName" min-width="120" show-overflow-tooltip />
       <el-table-column :label="t('wms.goodsInfo')" min-width="200">
         <template #default="scope">
           <div>{{ scope.row.skuCode }}</div>
           <div class="text-gray-500 text-xs">{{ scope.row.goodsName }}</div>
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.quantity')" prop="quantity" width="120" align="right">
+      <el-table-column :label="t('wms.quantity')" prop="quantity" min-width="120" show-overflow-tooltip align="right">
         <template #default="scope">
           <span class="font-medium">{{ scope.row.quantity }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.lockQuantity')" prop="lockQuantity" width="120" align="right">
+      <el-table-column :label="t('wms.lockQuantity')" prop="lockQuantity" min-width="120" show-overflow-tooltip align="right">
         <template #default="scope">
           <span v-if="scope.row.lockQuantity > 0" class="text-orange-500">{{ scope.row.lockQuantity }}</span>
           <span v-else class="text-gray-400">0</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.availableQuantity')" prop="availableQuantity" width="120" align="right">
+      <el-table-column :label="t('wms.availableQuantity')" prop="availableQuantity" min-width="120" show-overflow-tooltip align="right">
         <template #default="scope">
           <span class="text-green-600 font-medium">{{ scope.row.availableQuantity }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('common.createTime')" prop="createTime" width="160" :formatter="dateFormatter" />
+      <el-table-column :label="t('common.createTime')" prop="createTime" min-width="120" show-overflow-tooltip :formatter="dateFormatter" />
     </el-table>
     
     <!-- 分页 -->

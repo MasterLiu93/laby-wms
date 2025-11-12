@@ -455,117 +455,6 @@
   background: rgba(0, 0, 0, 0.8);
 }
 
-// ==================== Table 表格组件 ====================
-.el-table {
-  font-family: monospace;
-  background: var(--ios-bg-secondary);
-  border-color: rgba(142, 142, 147, 0.2);
-
-  // 只保留底部一个横向滚动条（隐藏表头处的横向滚动条）
-  .el-table__header-wrapper {
-    .el-scrollbar__bar.is-horizontal {
-      display: none !important;
-      height: 0 !important;
-      opacity: 0 !important;
-    }
-
-    .el-scrollbar__wrap {
-      overflow-x: hidden !important;
-    }
-  }
-
-  // 底部主体允许横向滚动
-  .el-table__body-wrapper {
-    .el-scrollbar__wrap {
-      overflow-x: auto !important;
-      overflow-y: hidden !important;
-    }
-  }
-
-  &__header {
-    background: rgba(142, 142, 147, 0.08) !important;
-
-    th {
-      background: transparent;
-      color: var(--ios-text-primary, #000000) !important;
-      font-weight: 600 !important;
-      font-size: 14px;
-      border-bottom-color: rgba(142, 142, 147, 0.25) !important;
-      transition: background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-      letter-spacing: 0.1px;
-
-      &:hover {
-        background: rgba(142, 142, 147, 0.12) !important;
-      }
-    }
-  }
-
-  &__body {
-    tr {
-      transition: background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-
-      &:hover {
-        background: rgba(142, 142, 147, 0.08) !important;
-      }
-
-      td {
-        color: var(--ios-text-primary, #000000) !important;
-        border-bottom-color: rgba(142, 142, 147, 0.15) !important;
-        font-weight: 400;
-        font-size: 14px;
-      }
-    }
-  }
-
-  &--striped {
-    .el-table__body {
-      tr.el-table__row--striped {
-        background: rgba(142, 142, 147, 0.04);
-      }
-
-      tr.el-table__row--striped:hover {
-        background: rgba(142, 142, 147, 0.08);
-      }
-    }
-  }
-
-  // 表格边框优化
-  &__border {
-    border-color: rgba(142, 142, 147, 0.2);
-
-    &::after {
-      background-color: rgba(142, 142, 147, 0.2);
-    }
-  }
-
-  // 固定列阴影优化
-  &__fixed,
-  &__fixed-right {
-    &::before {
-      background-color: rgba(142, 142, 147, 0.08);
-    }
-  }
-
-  // 空状态
-  .el-table__empty-block {
-    background: transparent;
-    color: var(--ios-text-secondary, #3c3c43) !important;
-    font-weight: 400;
-  }
-
-  // 排序图标
-  .caret-wrapper {
-    .sort-caret {
-      &.ascending {
-        border-bottom-color: var(--ios-color-primary);
-      }
-
-      &.descending {
-        border-top-color: var(--ios-color-primary);
-      }
-    }
-  }
-}
 
 // ==================== Card 卡片组件 ====================
 .el-card {
@@ -1188,42 +1077,6 @@
     }
   }
 
-  // 表格组件
-  .el-table {
-    background: var(--ios-bg-secondary, #1c1c1e) !important;
-    border-color: rgba(142, 142, 147, 0.3) !important;
-
-    &__header {
-      background: rgba(142, 142, 147, 0.12) !important;
-
-      th {
-        color: var(--ios-text-primary, #ffffff) !important;
-        font-weight: 600 !important;
-        border-bottom-color: rgba(142, 142, 147, 0.3) !important;
-
-        &:hover {
-          background: rgba(142, 142, 147, 0.18) !important;
-        }
-      }
-    }
-
-    &__body {
-      tr {
-        &:hover {
-          background: rgba(142, 142, 147, 0.12) !important;
-        }
-
-        td {
-          color: var(--ios-text-primary, #ffffff) !important;
-          border-bottom-color: rgba(142, 142, 147, 0.2) !important;
-        }
-      }
-    }
-
-    .el-table__empty-block {
-      color: var(--ios-text-secondary, #aeaeb2) !important;
-    }
-  }
 
   // 标签组件
   .el-tag {
@@ -1514,3 +1367,192 @@
     }
   }
 }
+
+// ==================== Table 表格组件 - 重新设计 ====================
+.el-table {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--ios-bg-secondary);
+  border-radius: 12px;
+  border: 1px solid rgba(142, 142, 147, 0.15);
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+  // 表头设计
+  &__header {
+    background: rgba(142, 142, 147, 0.06);
+    
+    th {
+      background: transparent;
+      color: var(--ios-text-primary, #1d1d1f);
+      font-weight: 600;
+      font-size: 13px;
+      letter-spacing: 0.2px;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(142, 142, 147, 0.2);
+      padding: 16px 12px;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(142, 142, 147, 0.1);
+      }
+
+      // 排序图标
+      .caret-wrapper {
+        .sort-caret {
+          &.ascending {
+            border-bottom-color: var(--ios-color-primary, #007aff);
+          }
+          &.descending {
+            border-top-color: var(--ios-color-primary, #007aff);
+          }
+        }
+      }
+    }
+  }
+
+  // 表体设计
+  &__body {
+    tr {
+      transition: all 0.2s ease;
+      border-bottom: 1px solid rgba(142, 142, 147, 0.1);
+
+      &:hover {
+        background: rgba(0, 122, 255, 0.04);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      td {
+        color: var(--ios-text-primary, #1d1d1f);
+        font-weight: 400;
+        font-size: 14px;
+        padding: 14px 12px;
+        border-bottom: none;
+        vertical-align: middle;
+      }
+    }
+  }
+
+  // 条纹样式
+  &--striped {
+    .el-table__body {
+      tr.el-table__row--striped {
+        background: rgba(142, 142, 147, 0.03);
+      }
+    }
+  }
+
+  // 边框样式
+  &--border {
+    td, th {
+      border-right: 1px solid rgba(142, 142, 147, 0.1);
+      
+      &:last-child {
+        border-right: none;
+      }
+    }
+  }
+
+  // 固定列样式
+  &__fixed,
+  &__fixed-right {
+    background: var(--ios-bg-secondary);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    
+    &::before {
+      background: rgba(142, 142, 147, 0.1);
+    }
+  }
+
+  // 空状态
+  &__empty-block {
+    background: transparent;
+    color: var(--ios-text-secondary, #86868b);
+    font-weight: 400;
+    padding: 40px 20px;
+    
+    .el-table__empty-text {
+      font-size: 15px;
+    }
+  }
+
+  // 加载状态
+  &__loading-text {
+    color: var(--ios-text-secondary, #86868b);
+    font-weight: 400;
+  }
+}
+
+// 暗色模式适配
+.dark {
+  .el-table {
+    background: var(--ios-bg-secondary, #1c1c1e);
+    border-color: rgba(142, 142, 147, 0.25);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+
+    &__header {
+      background: rgba(142, 142, 147, 0.12);
+      
+      th {
+        color: var(--ios-text-primary, #f2f2f7);
+        border-bottom-color: rgba(142, 142, 147, 0.3);
+
+        &:hover {
+          background: rgba(142, 142, 147, 0.18);
+        }
+      }
+    }
+
+    &__body {
+      tr {
+        border-bottom-color: rgba(142, 142, 147, 0.15);
+
+        &:hover {
+          background: rgba(0, 122, 255, 0.08);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        td {
+          color: var(--ios-text-primary, #f2f2f7);
+        }
+      }
+    }
+
+    &--striped {
+      .el-table__body {
+        tr.el-table__row--striped {
+          background: rgba(142, 142, 147, 0.08);
+        }
+      }
+    }
+
+    &--border {
+      td, th {
+        border-right-color: rgba(142, 142, 147, 0.15);
+      }
+    }
+
+    &__fixed,
+    &__fixed-right {
+      background: var(--ios-bg-secondary, #1c1c1e);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      
+      &::before {
+        background: rgba(142, 142, 147, 0.15);
+      }
+    }
+
+    &__empty-block {
+      color: var(--ios-text-secondary, #aeaeb2);
+    }
+
+    &__loading-text {
+      color: var(--ios-text-secondary, #aeaeb2);
+    }
+  }
+}
+

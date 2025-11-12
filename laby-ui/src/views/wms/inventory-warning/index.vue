@@ -73,21 +73,21 @@
     </div>
     
     <el-table v-loading="loading" :data="list" stripe>
-      <el-table-column v-if="columns.warningType.visible" :label="t('wms.warningType')" prop="warningType" width="120">
+      <el-table-column v-if="columns.warningType.visible" :label="t('wms.warningType')" prop="warningType" min-width="120" show-overflow-tooltip>
         <template #default="scope">
           <el-tag v-if="scope.row.warningType === 'LOW_STOCK'" type="warning">{{ t('wms.lowStock') }}</el-tag>
           <el-tag v-else-if="scope.row.warningType === 'EXPIRING'" type="danger">{{ t('wms.expiringSoon') }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column v-if="columns.warehouseName.visible" :label="t('wms.warehouse')" prop="warehouseName" width="120" />
+      <el-table-column v-if="columns.warehouseName.visible" :label="t('wms.warehouse')" prop="warehouseName" min-width="120" show-overflow-tooltip />
       <el-table-column v-if="columns.goodsInfo.visible" :label="t('wms.goodsInfo')" min-width="200">
         <template #default="scope">
           <div>{{ scope.row.skuCode }}</div>
           <div class="text-gray-500 text-xs">{{ scope.row.goodsName }}</div>
         </template>
       </el-table-column>
-      <el-table-column v-if="columns.batchNo.visible" :label="t('wms.batchNo')" prop="batchNo" width="140" />
-      <el-table-column v-if="columns.currentQuantity.visible" :label="t('wms.currentQuantity')" width="120" align="right">
+      <el-table-column v-if="columns.batchNo.visible" :label="t('wms.batchNo')" prop="batchNo" min-width="120" show-overflow-tooltip />
+      <el-table-column v-if="columns.currentQuantity.visible" :label="t('wms.currentQuantity')" min-width="120" show-overflow-tooltip align="right">
         <template #default="scope">
           <div>{{ t('wms.totalQuantity') }}：{{ scope.row.quantity }}</div>
           <div class="text-gray-500 text-xs" v-if="scope.row.lockQuantity > 0">
@@ -95,20 +95,20 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column v-if="columns.availableQuantity.visible" :label="t('wms.availableQuantity')" prop="availableQuantity" width="100" align="right">
+      <el-table-column v-if="columns.availableQuantity.visible" :label="t('wms.availableQuantity')" prop="availableQuantity" min-width="120" show-overflow-tooltip align="right">
         <template #default="scope">
           <span :class="scope.row.availableQuantity < (scope.row.safetyStock || 0) ? 'text-red-500 font-bold' : 'text-green-600'">
             {{ scope.row.availableQuantity }}
           </span>
         </template>
       </el-table-column>
-      <el-table-column v-if="columns.safetyStock.visible" :label="t('wms.safetyStock')" prop="safetyStock" width="100" align="right">
+      <el-table-column v-if="columns.safetyStock.visible" :label="t('wms.safetyStock')" prop="safetyStock" min-width="120" show-overflow-tooltip align="right">
         <template #default="scope">
           <span v-if="scope.row.safetyStock" class="text-blue-500">{{ scope.row.safetyStock }}</span>
           <span v-else class="text-gray-400">-</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="columns.expireInfo.visible" :label="t('wms.expireInfo')" width="150">
+      <el-table-column v-if="columns.expireInfo.visible" :label="t('wms.expireInfo')" min-width="120" show-overflow-tooltip>
         <template #default="scope">
           <div v-if="scope.row.expireDate">
             <div class="text-xs">{{ scope.row.expireDate }}</div>

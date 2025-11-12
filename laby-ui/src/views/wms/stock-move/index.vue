@@ -85,21 +85,21 @@
     </div>
     
     <el-table v-loading="loading" :data="list">
-      <el-table-column v-if="columns.moveNo.visible" :label="t('wms.moveNo')" prop="moveNo" width="160" align="center" />
-      <el-table-column v-if="columns.warehouseName.visible" :label="t('wms.warehouse')" prop="warehouseName" width="120" align="center" />
-      <el-table-column v-if="columns.moveType.visible" :label="t('wms.moveType')" prop="moveType" width="100" align="center">
+      <el-table-column v-if="columns.moveNo.visible" :label="t('wms.moveNo')" prop="moveNo" min-width="120" show-overflow-tooltip align="center" />
+      <el-table-column v-if="columns.warehouseName.visible" :label="t('wms.warehouse')" prop="warehouseName" min-width="120" show-overflow-tooltip align="center" />
+      <el-table-column v-if="columns.moveType.visible" :label="t('wms.moveType')" prop="moveType" min-width="120" show-overflow-tooltip align="center">
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_STOCK_MOVE_TYPE" :value="scope.row.moveType" />
         </template>
       </el-table-column>
       <el-table-column v-if="columns.goodsName.visible" :label="t('wms.goodsName')" prop="goodsName" min-width="180" show-overflow-tooltip />
-      <el-table-column v-if="columns.skuCode.visible" :label="t('wms.skuCode')" prop="skuCode" width="140" align="center" />
-      <el-table-column v-if="columns.batchNo.visible" :label="t('wms.batchNo')" prop="batchNo" width="120" align="center" />
-      <el-table-column v-if="columns.fromLocationCode.visible" :label="t('wms.fromLocationCode')" prop="fromLocationCode" width="120" align="center" />
-      <el-table-column v-if="columns.toLocationCode.visible" :label="t('wms.toLocationCode')" prop="toLocationCode" width="120" align="center" />
-      <el-table-column v-if="columns.quantity.visible" :label="t('wms.quantity')" prop="quantity" width="100" align="center" />
-      <el-table-column v-if="columns.moveReason.visible" :label="t('wms.moveReason')" prop="moveReason" width="150" show-overflow-tooltip />
-      <el-table-column v-if="columns.status.visible" :label="t('wms.status')" prop="status" width="100" align="center" show-overflow-tooltip>
+      <el-table-column v-if="columns.skuCode.visible" :label="t('wms.skuCode')" prop="skuCode" min-width="120" show-overflow-tooltip align="center" />
+      <el-table-column v-if="columns.batchNo.visible" :label="t('wms.batchNo')" prop="batchNo" min-width="120" show-overflow-tooltip align="center" />
+      <el-table-column v-if="columns.fromLocationCode.visible" :label="t('wms.fromLocationCode')" prop="fromLocationCode" min-width="120" show-overflow-tooltip align="center" />
+      <el-table-column v-if="columns.toLocationCode.visible" :label="t('wms.toLocationCode')" prop="toLocationCode" min-width="120" show-overflow-tooltip align="center" />
+      <el-table-column v-if="columns.quantity.visible" :label="t('wms.quantity')" prop="quantity" min-width="120" show-overflow-tooltip align="center" />
+      <el-table-column v-if="columns.moveReason.visible" :label="t('wms.moveReason')" prop="moveReason" min-width="120" show-overflow-tooltip />
+      <el-table-column v-if="columns.status.visible" :label="t('wms.status')" prop="status" min-width="120" show-overflow-tooltip align="center">
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_STOCK_MOVE_STATUS" :value="scope.row.status" />
         </template>
@@ -108,11 +108,11 @@
         v-if="columns.createTime.visible"
         :label="t('common.createTime')"
         prop="createTime"
-        width="160"
+        min-width="120" show-overflow-tooltip
         align="center"
         :formatter="dateFormatter"
       />
-      <el-table-column :label="t('action.action')" fixed="right" width="200" align="center">
+      <el-table-column :label="t('action.action')" fixed="right" min-width="120" show-overflow-tooltip align="center">
         <template #default="scope">
           <el-button
             link

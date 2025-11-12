@@ -107,20 +107,20 @@
   <!-- 列表 -->
   <ContentWrap>
     <el-table v-loading="loading" :data="list" stripe max-height="400">
-      <el-table-column :label="t('wms.statisticDate')" prop="statisticDate" width="120" align="center" :formatter="dateFormatter" fixed="left" />
-      <el-table-column :label="t('wms.inboundQuantity')" prop="inboundQuantity" width="140" align="right">
+      <el-table-column :label="t('wms.statisticDate')" prop="statisticDate" min-width="120" show-overflow-tooltip align="center" :formatter="dateFormatter" fixed="left" />
+      <el-table-column :label="t('wms.inboundQuantity')" prop="inboundQuantity" min-width="120" show-overflow-tooltip align="right">
         <template #default="scope">
           <span class="text-success">{{ scope.row.inboundQuantity }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.inboundOrderCount')" prop="inboundOrderCount" width="120" align="center" />
-      <el-table-column :label="t('wms.outboundQuantity')" prop="outboundQuantity" width="140" align="right">
+      <el-table-column :label="t('wms.inboundOrderCount')" prop="inboundOrderCount" min-width="120" show-overflow-tooltip align="center" />
+      <el-table-column :label="t('wms.outboundQuantity')" prop="outboundQuantity" min-width="120" show-overflow-tooltip align="right">
         <template #default="scope">
           <span class="text-warning">{{ scope.row.outboundQuantity }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.outboundOrderCount')" prop="outboundOrderCount" width="120" align="center" />
-      <el-table-column :label="t('wms.netChange')" prop="netChange" width="140" align="right">
+      <el-table-column :label="t('wms.outboundOrderCount')" prop="outboundOrderCount" min-width="120" show-overflow-tooltip align="center" />
+      <el-table-column :label="t('wms.netChange')" prop="netChange" min-width="120" show-overflow-tooltip align="right">
         <template #default="scope">
           <span :class="scope.row.netChange >= 0 ? 'text-primary' : 'text-danger'">
             {{ scope.row.netChange }}

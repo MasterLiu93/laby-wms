@@ -107,7 +107,7 @@
     <el-table v-loading="loading" :data="list" stripe>
       <el-table-column v-if="columns.waveNo.visible" :label="t('wms.waveNo')" prop="waveNo" min-width="180" show-overflow-tooltip fixed />
       <el-table-column v-if="columns.warehouseName.visible" :label="t('wms.warehouse')" prop="warehouseName" min-width="120" show-overflow-tooltip />
-      <el-table-column v-if="columns.waveType.visible" :label="t('wms.waveType')" prop="waveType" min-width="100" align="center">
+      <el-table-column v-if="columns.waveType.visible" :label="t('wms.waveType')" prop="waveType" min-width="120" show-overflow-tooltip align="center">
         <template #default="{ row }">
           <dict-tag :type="DICT_TYPE.WMS_WAVE_TYPE" :value="row.waveType" />
         </template>
@@ -120,22 +120,22 @@
           <span v-else style="color: #999">-</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="columns.orderCount.visible" :label="t('wms.orderCount')" prop="orderCount" min-width="90" align="center" />
-      <el-table-column v-if="columns.totalQuantity.visible" :label="t('wms.totalQuantity')" prop="totalQuantity" min-width="90" align="center" />
-      <el-table-column v-if="columns.priority.visible" :label="t('wms.priority')" prop="priority" min-width="80" align="center">
+      <el-table-column v-if="columns.orderCount.visible" :label="t('wms.orderCount')" prop="orderCount" min-width="120" show-overflow-tooltip align="center" />
+      <el-table-column v-if="columns.totalQuantity.visible" :label="t('wms.totalQuantity')" prop="totalQuantity" min-width="120" show-overflow-tooltip align="center" />
+      <el-table-column v-if="columns.priority.visible" :label="t('wms.priority')" prop="priority" min-width="120" show-overflow-tooltip align="center">
         <template #default="{ row }">
           <el-tag v-if="row.priority === 3" type="danger">{{ t('wms.urgent') }}</el-tag>
           <el-tag v-else-if="row.priority === 2" type="warning">{{ t('wms.important') }}</el-tag>
           <el-tag v-else type="info">{{ t('wms.normal') }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column v-if="columns.pickerName.visible" :label="t('wms.picker')" prop="pickerName" min-width="100" show-overflow-tooltip>
+      <el-table-column v-if="columns.pickerName.visible" :label="t('wms.picker')" prop="pickerName" min-width="120" show-overflow-tooltip>
         <template #default="{ row }">
           <span v-if="row.pickerName">{{ row.pickerName }}</span>
           <el-tag v-else type="info">{{ t('wms.unassigned') }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column v-if="columns.status.visible" :label="t('wms.waveStatus')" prop="status" min-width="100" align="center">
+      <el-table-column v-if="columns.status.visible" :label="t('wms.waveStatus')" prop="status" min-width="120" show-overflow-tooltip align="center">
         <template #default="{ row }">
           <dict-tag :type="DICT_TYPE.WMS_WAVE_STATUS" :value="row.status" />
         </template>
@@ -144,19 +144,21 @@
         v-if="columns.startTime.visible"
         :label="t('wms.startTime')"
         prop="startTime"
-        min-width="160"
+        min-width="120"
+        show-overflow-tooltip
         :formatter="dateFormatter"
       />
-      <el-table-column v-if="columns.endTime.visible" :label="t('wms.endTime')" prop="endTime" min-width="160" :formatter="dateFormatter" />
-      <el-table-column v-if="columns.remark.visible" :label="t('form.remark')" prop="remark" min-width="150" show-overflow-tooltip />
+      <el-table-column v-if="columns.endTime.visible" :label="t('wms.endTime')" prop="endTime" min-width="120" show-overflow-tooltip :formatter="dateFormatter" />
+      <el-table-column v-if="columns.remark.visible" :label="t('form.remark')" prop="remark" min-width="120" show-overflow-tooltip />
       <el-table-column
         v-if="columns.createTime.visible"
         :label="t('common.createTime')"
         prop="createTime"
-        min-width="160"
+        min-width="120"
+        show-overflow-tooltip
         :formatter="dateFormatter"
       />
-      <el-table-column :label="t('action.action')" align="center" min-width="200" fixed="right">
+      <el-table-column :label="t('action.action')" align="center" min-width="120" show-overflow-tooltip fixed="right">
         <template #default="{ row }">
           <el-button
             link

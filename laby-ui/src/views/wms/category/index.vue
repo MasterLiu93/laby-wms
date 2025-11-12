@@ -93,16 +93,16 @@
       :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
     >
       <el-table-column prop="categoryName" :label="t('wms.categoryName')" min-width="200px" show-overflow-tooltip />
-      <el-table-column prop="categoryCode" :label="t('wms.categoryCode')" width="150px" />
-      <el-table-column prop="level" :label="t('wms.level')" width="80px" align="center">
+      <el-table-column prop="categoryCode" :label="t('wms.categoryCode')" min-width="120" show-overflow-tooltip />
+      <el-table-column prop="level" :label="t('wms.level')" min-width="120" show-overflow-tooltip align="center">
         <template #default="scope">
           <el-tag v-if="scope.row.level === 1" type="success">{{ t('wms.levelOne') }}</el-tag>
           <el-tag v-else-if="scope.row.level === 2" type="warning">{{ t('wms.levelTwo') }}</el-tag>
           <el-tag v-else-if="scope.row.level === 3" type="info">{{ t('wms.levelThree') }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="sort" :label="t('wms.categorySort')" width="80px" align="center" />
-      <el-table-column :label="t('common.status')" width="80px" align="center">
+      <el-table-column prop="sort" :label="t('wms.categorySort')" min-width="120" show-overflow-tooltip align="center" />
+      <el-table-column :label="t('common.status')" min-width="120" show-overflow-tooltip align="center">
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
         </template>
@@ -112,10 +112,10 @@
         align="center"
         prop="createTime"
         :formatter="dateFormatter"
-        width="180px"
+        min-width="120" show-overflow-tooltip
       />
       <!-- 操作列 -->
-      <el-table-column :label="t('table.action')" align="center" fixed="right" width="230px">
+      <el-table-column :label="t('table.action')" align="center" fixed="right" min-width="200" show-overflow-tooltip>
         <template #default="scope">
           <el-button
             link

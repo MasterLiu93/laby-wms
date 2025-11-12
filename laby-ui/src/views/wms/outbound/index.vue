@@ -115,7 +115,7 @@
         v-if="columns.outboundType.visible" 
         :label="t('common.type')" 
         align="center" 
-        width="130"
+        min-width="120" show-overflow-tooltip
       >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_OUTBOUND_TYPE" :value="scope.row.outboundType" />
@@ -146,21 +146,21 @@
         :label="t('wms.totalQuantity')" 
         align="center" 
         prop="totalQuantity" 
-        width="90" 
+        min-width="120" show-overflow-tooltip 
       />
       <el-table-column 
         v-if="columns.pickedQuantity.visible" 
         :label="t('wms.pickedQuantity')" 
         align="center" 
         prop="pickedQuantity" 
-        width="90" 
+        min-width="120" show-overflow-tooltip 
       />
       <el-table-column 
         v-if="columns.totalAmount.visible" 
         :label="t('wms.totalAmount')" 
         align="center" 
         prop="totalAmount" 
-        width="180"
+        min-width="120" show-overflow-tooltip
       >
         <template #default="scope">
           <span v-if="scope.row.totalAmount" class="text-red-500 font-semibold">
@@ -173,7 +173,7 @@
         v-if="columns.status.visible" 
         :label="t('common.status')" 
         align="center" 
-        width="120"
+        min-width="120" show-overflow-tooltip
       >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_OUTBOUND_STATUS" :value="scope.row.status" />
@@ -185,9 +185,9 @@
         align="center" 
         prop="createTime" 
         :formatter="dateFormatter" 
-        width="180" 
+        min-width="120" show-overflow-tooltip 
       />
-      <el-table-column :label="t('action.action')" align="center" fixed="right" min-width="160">
+      <el-table-column :label="t('action.action')" align="center" fixed="right" min-width="200" show-overflow-tooltip>
         <template #default="scope">
           <el-button link type="primary" @click="openDetail(scope.row)" v-hasPermi="['wms:outbound:query']">
             {{ t('action.detail') }}

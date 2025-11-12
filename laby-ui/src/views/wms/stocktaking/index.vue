@@ -69,30 +69,30 @@
     </div>
     
     <el-table v-loading="loading" :data="list">
-      <el-table-column v-if="columns.takingNo.visible" :label="t('wms.takingNo')" prop="takingNo" width="160" align="center" />
-      <el-table-column v-if="columns.planNo.visible" :label="t('wms.planNo')" prop="planNo" width="160" align="center" />
-      <el-table-column v-if="columns.warehouseName.visible" :label="t('wms.warehouse')" prop="warehouseName" width="120" align="center" />
-      <el-table-column v-if="columns.locationCode.visible" :label="t('wms.locationCode')" prop="locationCode" width="120" align="center" />
+      <el-table-column v-if="columns.takingNo.visible" :label="t('wms.takingNo')" prop="takingNo" min-width="120" show-overflow-tooltip align="center" />
+      <el-table-column v-if="columns.planNo.visible" :label="t('wms.planNo')" prop="planNo" min-width="120" show-overflow-tooltip align="center" />
+      <el-table-column v-if="columns.warehouseName.visible" :label="t('wms.warehouse')" prop="warehouseName" min-width="120" show-overflow-tooltip align="center" />
+      <el-table-column v-if="columns.locationCode.visible" :label="t('wms.locationCode')" prop="locationCode" min-width="120" show-overflow-tooltip align="center" />
       <el-table-column v-if="columns.goodsName.visible" :label="t('wms.goodsName')" prop="goodsName" min-width="180" show-overflow-tooltip />
-      <el-table-column v-if="columns.skuCode.visible" :label="t('wms.skuCode')" prop="skuCode" width="140" align="center" />
-      <el-table-column v-if="columns.batchNo.visible" :label="t('wms.batchNo')" prop="batchNo" width="120" align="center" />
-      <el-table-column v-if="columns.bookQuantity.visible" :label="t('wms.bookQuantity')" prop="bookQuantity" width="100" align="center" />
-      <el-table-column v-if="columns.actualQuantity.visible" :label="t('wms.actualQuantity')" prop="actualQuantity" width="100" align="center" />
-      <el-table-column v-if="columns.diffQuantity.visible" :label="t('wms.diffQuantity')" prop="diffQuantity" width="100" align="center">
+      <el-table-column v-if="columns.skuCode.visible" :label="t('wms.skuCode')" prop="skuCode" min-width="120" show-overflow-tooltip align="center" />
+      <el-table-column v-if="columns.batchNo.visible" :label="t('wms.batchNo')" prop="batchNo" min-width="120" show-overflow-tooltip align="center" />
+      <el-table-column v-if="columns.bookQuantity.visible" :label="t('wms.bookQuantity')" prop="bookQuantity" min-width="120" show-overflow-tooltip align="center" />
+      <el-table-column v-if="columns.actualQuantity.visible" :label="t('wms.actualQuantity')" prop="actualQuantity" min-width="120" show-overflow-tooltip align="center" />
+      <el-table-column v-if="columns.diffQuantity.visible" :label="t('wms.diffQuantity')" prop="diffQuantity" min-width="120" show-overflow-tooltip align="center">
         <template #default="scope">
           <span :class="{ 'text-red-500': scope.row.diffQuantity && scope.row.diffQuantity < 0, 'text-green-500': scope.row.diffQuantity && scope.row.diffQuantity > 0 }">
             {{ scope.row.diffQuantity || '-' }}
           </span>
         </template>
       </el-table-column>
-      <el-table-column v-if="columns.status.visible" :label="t('wms.status')" prop="status" width="100" align="center" show-overflow-tooltip>
+      <el-table-column v-if="columns.status.visible" :label="t('wms.status')" prop="status" min-width="120" show-overflow-tooltip align="center">
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_STOCK_TAKING_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
-      <el-table-column v-if="columns.operator.visible" :label="t('wms.operator')" prop="operator" width="100" align="center" />
-      <el-table-column v-if="columns.createTime.visible" :label="t('common.createTime')" prop="createTime" width="160" align="center" :formatter="dateFormatter" />
-      <el-table-column :label="t('action.action')" fixed="right" width="220" align="center">
+      <el-table-column v-if="columns.operator.visible" :label="t('wms.operator')" prop="operator" min-width="120" show-overflow-tooltip align="center" />
+      <el-table-column v-if="columns.createTime.visible" :label="t('common.createTime')" prop="createTime" min-width="120" show-overflow-tooltip align="center" :formatter="dateFormatter" />
+      <el-table-column :label="t('action.action')" fixed="right" min-width="200" show-overflow-tooltip align="center">
         <template #default="scope">
           <el-button link type="primary" @click="openForm('update', scope.row.id)" v-if="scope.row.status === 1">
             {{ t('action.edit') }}

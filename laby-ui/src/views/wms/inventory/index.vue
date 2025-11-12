@@ -144,7 +144,8 @@
         :label="t('wms.warehouse')" 
         align="center" 
         prop="warehouseName" 
-        width="120px" 
+        min-width="120" 
+        show-overflow-tooltip
       />
       
       <el-table-column 
@@ -152,7 +153,8 @@
         :label="t('wms.area')" 
         align="center" 
         prop="areaName" 
-        width="120px"
+        min-width="120"
+        show-overflow-tooltip
       >
         <template #default="scope">
           {{ scope.row.areaName || '-' }}
@@ -164,7 +166,8 @@
         :label="t('wms.location')" 
         align="center" 
         prop="locationCode" 
-        width="160px"
+        min-width="160"
+        show-overflow-tooltip
       >
         <template #default="scope">
           <div v-if="scope.row.locationId">
@@ -197,7 +200,8 @@
         v-if="columns.batchNo.visible" 
         :label="t('wms.batchSerial')" 
         align="center" 
-        width="150px"
+        min-width="150"
+        show-overflow-tooltip
       >
         <template #default="scope">
           <div v-if="scope.row.batchNo || scope.row.serialNo">
@@ -213,7 +217,7 @@
         :label="t('wms.quantity')" 
         align="center" 
         prop="quantity" 
-        width="100px"
+        min-width="100"
       >
         <template #default="scope">
           <el-tag type="primary">{{ scope.row.quantity }}</el-tag>
@@ -225,7 +229,7 @@
         :label="t('wms.lockQuantity')" 
         align="center" 
         prop="lockQuantity" 
-        width="100px"
+        min-width="100"
       >
         <template #default="scope">
           <el-tag v-if="scope.row.lockQuantity > 0" type="warning">{{ scope.row.lockQuantity }}</el-tag>
@@ -238,7 +242,7 @@
         :label="t('wms.availableQuantity')" 
         align="center" 
         prop="availableQuantity" 
-        width="100px"
+        min-width="120"
       >
         <template #default="scope">
           <el-tag type="success">{{ scope.row.availableQuantity || (scope.row.quantity - scope.row.lockQuantity) }}</el-tag>
@@ -249,7 +253,8 @@
         v-if="columns.status.visible" 
         :label="t('common.status')" 
         align="center" 
-        width="100px"
+        min-width="120"
+        show-overflow-tooltip
       >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_INVENTORY_STATUS" :value="scope.row.status" />
@@ -262,11 +267,12 @@
         align="center"
         prop="createTime"
         :formatter="dateFormatter"
-        width="180px"
+        min-width="120"
+        show-overflow-tooltip
       />
       
       <!-- 操作列 -->
-      <el-table-column :label="t('table.action')" align="center" fixed="right" width="180px">
+      <el-table-column :label="t('table.action')" align="center" fixed="right" min-width="200" show-overflow-tooltip>
         <template #default="scope">
           <el-button
             link

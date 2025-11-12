@@ -103,6 +103,8 @@
         :label="t('wms.warehouseName')" 
         align="center" 
         prop="warehouseName" 
+        min-width="150"
+        show-overflow-tooltip
       />
       
       <el-table-column 
@@ -110,6 +112,7 @@
         :label="t('wms.warehouseType')" 
         align="center" 
         prop="warehouseType"
+        min-width="120"
       >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_WAREHOUSE_TYPE" :value="scope.row.warehouseType" />
@@ -121,6 +124,7 @@
         :label="t('wms.address')" 
         align="center" 
         prop="address" 
+        min-width="200"
         show-overflow-tooltip 
       />
       
@@ -129,6 +133,8 @@
         :label="t('wms.contactPerson')" 
         align="center" 
         prop="contactPerson" 
+        min-width="120"
+        show-overflow-tooltip
       />
       
       <el-table-column 
@@ -136,6 +142,8 @@
         :label="t('wms.contactPhone')" 
         align="center" 
         prop="contactPhone" 
+        min-width="140"
+        show-overflow-tooltip
       />
       
       <el-table-column 
@@ -143,6 +151,7 @@
         :label="t('common.status')" 
         align="center" 
         prop="status"
+        min-width="100"
       >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
@@ -154,11 +163,11 @@
         :label="t('common.createTime')"
         align="center"
         prop="createTime"
-        width="180"
+        min-width="180"
         :formatter="dateFormatter"
         show-overflow-tooltip
       />
-      <el-table-column :label="t('table.action')" align="center" width="200" fixed="right">
+      <el-table-column :label="t('table.action')" align="center" min-width="200" fixed="right" show-overflow-tooltip>
         <template #default="scope">
           <el-button
             link

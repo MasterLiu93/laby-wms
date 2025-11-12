@@ -115,7 +115,8 @@
         v-if="columns.inboundType.visible" 
         :label="t('common.type')" 
         align="center" 
-        width="130"
+        min-width="120"
+        show-overflow-tooltip
       >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_INBOUND_TYPE" :value="scope.row.inboundType" />
@@ -146,34 +147,37 @@
         :label="t('wms.totalQuantity')" 
         align="center" 
         prop="totalQuantity" 
-        width="90" 
+        min-width="120" 
+        show-overflow-tooltip
       />
       <el-table-column 
         v-if="columns.receivedQuantity.visible" 
         :label="t('wms.receivedQuantity')" 
         align="center" 
         prop="receivedQuantity" 
-        width="90" 
+        min-width="120" 
+        show-overflow-tooltip
       />
       <el-table-column 
         v-if="columns.totalAmount.visible" 
         :label="t('wms.totalAmount')" 
         align="center" 
         prop="totalAmount" 
-        width="180"
+        min-width="120"
+        show-overflow-tooltip
       >
         <template #default="scope">
           <span v-if="scope.row.totalAmount" class="text-red-500 font-semibold">
-            ¥{{ scope.row.totalAmount.toFixed(2) }}
+            {{ formatToFraction(scope.row.totalAmount) }}
           </span>
-          <span v-else class="text-gray-400">-</span>
         </template>
       </el-table-column>
       <el-table-column 
         v-if="columns.status.visible" 
         :label="t('common.status')" 
         align="center" 
-        width="130"
+        min-width="120"
+        show-overflow-tooltip
       >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_INBOUND_STATUS" :value="scope.row.status" />
@@ -185,9 +189,10 @@
         align="center" 
         prop="createTime" 
         :formatter="dateFormatter" 
-        width="180" 
+        min-width="120" 
+        show-overflow-tooltip
       />
-      <el-table-column :label="t('action.action')" align="center" fixed="right" min-width="160">
+      <el-table-column :label="t('action.action')" align="center" fixed="right" min-width="200" show-overflow-tooltip>
         <template #default="scope">
           <el-button link type="primary" @click="openDetail(scope.row)" v-hasPermi="['wms:inbound:query']">
             {{ t('action.detail') }}
@@ -233,6 +238,7 @@
 import { dateFormatter } from '@/utils/formatTime'
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { useDictI18n } from '@/hooks/web/useDictI18n'
+import { formatToFraction } from '@/utils'
 
 const { getDictLabel } = useDictI18n() // 字典国际化
 import { getInboundPage, deleteInbound, auditInbound, cancelInbound } from '@/api/wms/inbound'

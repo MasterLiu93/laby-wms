@@ -126,35 +126,35 @@
     </div>
     
     <el-table v-loading="loading" :data="list">
-      <el-table-column v-if="columns.goodsCode.visible" :label="t('wms.goodsCode')" align="center" prop="goodsCode" width="120" />
+      <el-table-column v-if="columns.goodsCode.visible" :label="t('wms.goodsCode')" align="center" prop="goodsCode" min-width="120" show-overflow-tooltip />
       <el-table-column v-if="columns.goodsName.visible" :label="t('wms.goodsName')" align="center" prop="goodsName" min-width="150" />
-      <el-table-column v-if="columns.warehouseName.visible" :label="t('wms.warehouse')" align="center" prop="warehouseName" width="120" />
-      <el-table-column v-if="columns.avgInventory.visible" :label="t('wms.avgInventory')" align="center" prop="avgInventory" width="100">
+      <el-table-column v-if="columns.warehouseName.visible" :label="t('wms.warehouse')" align="center" prop="warehouseName" min-width="120" show-overflow-tooltip />
+      <el-table-column v-if="columns.avgInventory.visible" :label="t('wms.avgInventory')" align="center" prop="avgInventory" min-width="120" show-overflow-tooltip>
         <template #default="{ row }">
           {{ row.avgInventory?.toFixed(2) || 0 }}
         </template>
       </el-table-column>
-      <el-table-column v-if="columns.outboundQuantity.visible" :label="t('wms.outboundQuantity')" align="center" prop="outboundQuantity" width="120" />
-      <el-table-column v-if="columns.turnoverRate.visible" :label="t('wms.turnoverRate')" align="center" prop="turnoverRate" width="100">
+      <el-table-column v-if="columns.outboundQuantity.visible" :label="t('wms.outboundQuantity')" align="center" prop="outboundQuantity" min-width="120" show-overflow-tooltip />
+      <el-table-column v-if="columns.turnoverRate.visible" :label="t('wms.turnoverRate')" align="center" prop="turnoverRate" min-width="120" show-overflow-tooltip>
         <template #default="{ row }">
           <el-tag :type="getTurnoverRateType(row.turnoverRate)">
             {{ row.turnoverRate?.toFixed(2) || 0 }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column v-if="columns.turnoverDays.visible" :label="t('wms.turnoverDays')" align="center" prop="turnoverDays" width="100">
+      <el-table-column v-if="columns.turnoverDays.visible" :label="t('wms.turnoverDays')" align="center" prop="turnoverDays" min-width="120" show-overflow-tooltip>
         <template #default="{ row }">
           {{ row.turnoverDays?.toFixed(0) || 0 }} {{ t('wms.days') }}
         </template>
       </el-table-column>
-      <el-table-column v-if="columns.turnoverLevel.visible" :label="t('wms.turnoverLevel')" align="center" prop="turnoverLevel" width="100">
+      <el-table-column v-if="columns.turnoverLevel.visible" :label="t('wms.turnoverLevel')" align="center" prop="turnoverLevel" min-width="120" show-overflow-tooltip>
         <template #default="{ row }">
           <el-tag :type="getTurnoverLevelType(row.turnoverLevel)">
             {{ getTurnoverLevelText(row.turnoverLevel) }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column v-if="columns.dateRange.visible" :label="t('wms.dateRange')" align="center" width="200">
+      <el-table-column v-if="columns.dateRange.visible" :label="t('wms.dateRange')" align="center" min-width="120" show-overflow-tooltip>
         <template #default="{ row }">
           {{ row.startDate }} ~ {{ row.endDate }}
         </template>

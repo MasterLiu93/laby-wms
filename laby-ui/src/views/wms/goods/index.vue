@@ -91,7 +91,8 @@
         :label="t('wms.skuCode')" 
         align="center" 
         prop="skuCode" 
-        width="150px" 
+        min-width="120"
+        show-overflow-tooltip 
       />
       <el-table-column 
         v-if="columns.goodsName.visible" 
@@ -106,7 +107,8 @@
         v-if="columns.category.visible" 
         :label="t('wms.category')" 
         align="center" 
-        width="130px"
+        min-width="120"
+        show-overflow-tooltip
       >
         <template #default="scope">
           <el-tag v-if="scope.row.categoryName" type="info" size="small">
@@ -121,7 +123,8 @@
         :label="t('wms.brand')" 
         align="center" 
         prop="brand" 
-        width="120px"
+        min-width="120"
+        show-overflow-tooltip
       >
         <template #default="scope">
           {{ scope.row.brand || '-' }}
@@ -133,7 +136,7 @@
         :label="t('wms.model')" 
         align="center" 
         prop="model" 
-        width="120px" 
+        min-width="120"
         show-overflow-tooltip
       >
         <template #default="scope">
@@ -145,7 +148,8 @@
         v-if="columns.unit.visible" 
         :label="t('wms.unit')" 
         align="center" 
-        width="80px"
+        min-width="120"
+        show-overflow-tooltip
       >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_GOODS_UNIT" :value="scope.row.unit" />
@@ -157,7 +161,8 @@
         :label="t('wms.spec')" 
         align="center" 
         prop="spec" 
-        width="120px"
+        min-width="120"
+        show-overflow-tooltip
       >
         <template #default="scope">
           {{ scope.row.spec || '-' }}
@@ -183,7 +188,8 @@
         v-if="columns.batchSerial.visible" 
         :label="t('wms.batchSerial')" 
         align="center" 
-        width="120px"
+        min-width="120"
+        show-overflow-tooltip
       >
         <template #default="scope">
           <div class="flex gap-1 justify-center">
@@ -198,7 +204,8 @@
         v-if="columns.status.visible" 
         :label="t('common.status')" 
         align="center" 
-        width="80px"
+        min-width="120"
+        show-overflow-tooltip
       >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
@@ -210,14 +217,15 @@
         :label="t('common.createTime')" 
         align="center" 
         prop="createTime" 
-        width="180px"
+        min-width="120"
+        show-overflow-tooltip
       >
         <template #default="scope">
           {{ formatDate(scope.row.createTime) }}
         </template>
       </el-table-column>
       
-      <el-table-column :label="t('table.action')" align="center" fixed="right" width="180px">
+      <el-table-column :label="t('table.action')" align="center" fixed="right" min-width="200" show-overflow-tooltip>
         <template #default="scope">
           <el-button link type="primary" @click="openForm('update', scope.row.id)" v-hasPermi="['wms:goods:update']">
             {{ t('action.edit') }}

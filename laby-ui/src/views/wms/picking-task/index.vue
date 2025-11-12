@@ -161,7 +161,7 @@
         min-width="155"
         prop="createTime"
       />
-      <el-table-column align="center" fixed="right" :label="t('action.action')" min-width="180">
+      <el-table-column align="center" fixed="right" :label="t('action.action')" min-width="200" show-overflow-tooltip>
         <template #default="{ row }">
           <el-button
             v-hasPermi="['wms:picking-task:query']"

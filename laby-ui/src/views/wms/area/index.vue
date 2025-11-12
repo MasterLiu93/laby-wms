@@ -102,14 +102,16 @@
         :label="t('wms.warehouse')" 
         align="center" 
         prop="warehouseName" 
-        width="200px" 
+        min-width="120"
+        show-overflow-tooltip 
       />
       <el-table-column 
         v-if="columns.areaType.visible" 
         :label="t('wms.areaType')" 
         align="center" 
         prop="areaType" 
-        width="120px"
+        min-width="120"
+        show-overflow-tooltip
       >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_WAREHOUSE_AREA_TYPE" :value="scope.row.areaType" />
@@ -120,21 +122,24 @@
         :label="t('wms.floor')" 
         align="center" 
         prop="floor" 
-        width="80px" 
+        min-width="120"
+        show-overflow-tooltip 
       />
       <el-table-column 
         v-if="columns.areaSize.visible" 
         :label="t('wms.areaSize')" 
         align="center" 
         prop="areaSize" 
-        width="120px" 
+        min-width="120"
+        show-overflow-tooltip 
       />
       <el-table-column 
         v-if="columns.status.visible" 
         :label="t('common.status')" 
         align="center" 
         prop="status" 
-        width="100px"
+        min-width="120"
+        show-overflow-tooltip
       >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
@@ -146,9 +151,10 @@
         align="center"
         prop="createTime"
         :formatter="dateFormatter"
-        width="180px"
+        min-width="120"
+        show-overflow-tooltip
       />
-      <el-table-column :label="t('table.action')" align="center" width="200px" fixed="right">
+      <el-table-column :label="t('table.action')" align="center" min-width="200" show-overflow-tooltip fixed="right">
         <template #default="scope">
           <el-button
             link
