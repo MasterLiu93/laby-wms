@@ -9,6 +9,7 @@ import goods from './goods'
 import inventory from './inventory'
 import inventoryLog from './inventoryLog'
 import inventoryWarning from './inventoryWarning'
+import inventorySnapshot from './inventorySnapshot'
 import inbound from './inbound'
 import outbound from './outbound'
 import pickingWave from './pickingWave'
@@ -31,6 +32,7 @@ export default {
     ...inventory,
     ...inventoryLog,
     ...inventoryWarning,
+    ...inventorySnapshot,
     ...inbound,
     ...outbound,
     ...pickingWave,

@@ -1,5 +1,5 @@
 <template>
-  <ContentWrap>
+  <ContentWrap v-if="showSearch">
     <!-- 搜索工作栏 -->
     <el-form
       class="-mb-15px"
@@ -58,7 +58,7 @@
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.WMS_WAREHOUSE_LOCATION_TYPE)"
             :key="dict.value"
-            :label="dict.label"
+            :label="getDictLabel(dict)"
             :value="dict.value"
           />
         </el-select>
@@ -68,7 +68,7 @@
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.WMS_LOCATION_STATUS)"
             :key="dict.value"
-            :label="dict.label"
+            :label="getDictLabel(dict)"
             :value="dict.value"
           />
         </el-select>
@@ -99,25 +99,94 @@
 
   <!-- 列表 -->
   <ContentWrap>
-    <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
-      <el-table-column :label="t('wms.warehouse')" align="center" prop="warehouseName" />
-      <el-table-column :label="t('wms.area')" align="center" prop="areaName" />
-      <el-table-column :label="t('wms.rowNo')" align="center" prop="rowNo" />
-      <el-table-column :label="t('wms.columnNo')" align="center" prop="columnNo" />
-      <el-table-column :label="t('wms.layerNo')" align="center" prop="layerNo" />
-      <el-table-column :label="t('wms.locationType')" align="center" prop="locationType" width="150px">
+    <!-- 表格工具栏 -->
+    <div class="flex justify-between items-center mb-4">
+      <div class="text-sm text-gray-600">
+        {{ t('common.total') }}: {{ total }} {{ t('common.items') }}
+      </div>
+      <RightToolbar 
+        v-model:showSearch="showSearch"
+        :columns="columns"
+        :search="true"
+        @queryTable="getList"
+      />
+    </div>
+    
+    <el-table 
+      v-loading="loading" 
+      :data="list" 
+      stripe 
+      show-overflow-tooltip 
+    >
+      <el-table-column 
+        v-if="columns.warehouseName.visible" 
+        :label="t('wms.warehouse')" 
+        align="center" 
+        prop="warehouseName" 
+        width="200px" 
+      />
+      <el-table-column 
+        v-if="columns.areaName.visible" 
+        :label="t('wms.area')" 
+        align="center" 
+        prop="areaName" 
+      />
+      <el-table-column 
+        v-if="columns.rowNo.visible" 
+        :label="t('wms.rowNo')" 
+        align="center" 
+        prop="rowNo" 
+      />
+      <el-table-column 
+        v-if="columns.columnNo.visible" 
+        :label="t('wms.columnNo')" 
+        align="center" 
+        prop="columnNo" 
+      />
+      <el-table-column 
+        v-if="columns.layerNo.visible" 
+        :label="t('wms.layerNo')" 
+        align="center" 
+        prop="layerNo" 
+      />
+      <el-table-column 
+        v-if="columns.locationType.visible" 
+        :label="t('wms.locationType')" 
+        align="center" 
+        prop="locationType" 
+        width="150px"
+      >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_WAREHOUSE_LOCATION_TYPE" :value="scope.row.locationType" />
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.capacity')" align="center" prop="capacity" width="100px" />
-      <el-table-column :label="t('wms.maxWeight')" align="center" prop="maxWeight" width="120px" />
-      <el-table-column :label="t('common.status')" align="center" prop="status" width="100px">
+      <el-table-column 
+        v-if="columns.capacity.visible" 
+        :label="t('wms.capacity')" 
+        align="center" 
+        prop="capacity" 
+        width="100px" 
+      />
+      <el-table-column 
+        v-if="columns.maxWeight.visible" 
+        :label="t('wms.maxWeight')" 
+        align="center" 
+        prop="maxWeight" 
+        width="120px" 
+      />
+      <el-table-column 
+        v-if="columns.status.visible" 
+        :label="t('common.status')" 
+        align="center" 
+        prop="status" 
+        width="100px"
+      >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_LOCATION_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
       <el-table-column
+        v-if="columns.createTime.visible" 
         :label="t('common.createTime')"
         align="center"
         prop="createTime"
@@ -162,10 +231,15 @@
 import { dateFormatter } from '@/utils/formatTime'
 import download from '@/utils/download'
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { useDictI18n } from '@/hooks/web/useDictI18n'
 import * as WarehouseLocationApi from '@/api/wms/location'
 import * as WarehouseApi from '@/api/wms/warehouse'
 import * as WarehouseAreaApi from '@/api/wms/area'
+
+const { getDictLabel } = useDictI18n() // 字典国际化
 import WarehouseLocationForm from './WarehouseLocationForm.vue'
+import RightToolbar from '@/components/RightToolbar/index.vue'
+import { createWMSColumns } from '@/utils/wms-columns-config'
 
 /** 库位管理 列表 */
 defineOptions({ name: 'WmsWarehouseLocation' })
@@ -186,6 +260,12 @@ const queryParams = reactive({
   status: undefined
 })
 const queryFormRef = ref() // 搜索的表单
+
+// 列设置功能 - RuoYi风格
+const columns = reactive(createWMSColumns(t).location)
+
+// 显示搜索状态
+const showSearch = ref(true)
 const exportLoading = ref(false) // 导出的加载中
 const warehouseList = ref([]) // 仓库列表
 const areaList = ref([]) // 库区列表

@@ -1,0 +1,36 @@
+/**
+ * API 访问日志模块国际化（中文）
+ */
+export default {
+  apiAccessLog: 'API 访问日志',
+  traceId: '链路追踪',
+  userId: '用户编号',
+  userType: '用户类型',
+  applicationName: '应用名',
+  requestMethod: '请求方法',
+  requestUrl: '请求地址',
+  requestParams: '请求参数',
+  responseBody: '响应结果',
+  userIp: '用户 IP',
+  userAgent: '浏览器 UA',
+  operateModule: '操作模块',
+  operateName: '操作名',
+  operateType: '操作分类',
+  beginTime: '开始时间',
+  duration: '执行时长',
+  resultCode: '结果码',
+  resultMsg: '结果提示',
+  createTime: '创建时间',
+  traceIdPlaceholder: '请输入链路追踪编号',
+  userIdPlaceholder: '请输入用户编号',
+  userIpPlaceholder: '请输入用户 IP',
+  durationPlaceholder: '请输入执行时长',
+  resultCodePlaceholder: '请输入结果码',
+  viewDetail: '查看详情',
+  logDetail: '日志详情',
+  basicInfo: '基本信息',
+  requestInfo: '请求信息',
+  responseInfo: '响应信息',
+  exceptionInfo: '异常信息',
+  ms: '毫秒'
+}

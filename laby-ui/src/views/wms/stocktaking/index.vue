@@ -10,7 +10,7 @@
   @date 2025-10-28
 -->
 <template>
-  <ContentWrap>
+  <ContentWrap v-if="showSearch">
     <!-- 搜索工作栏 -->
     <el-form class="-mb-15px" :model="queryParams" ref="queryFormRef" :inline="true">
       <el-form-item :label="t('wms.takingNo')" prop="takingNo">
@@ -37,7 +37,7 @@
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.WMS_STOCK_TAKING_STATUS)"
             :key="dict.value"
-            :label="dict.label"
+            :label="getDictLabel(dict)"
             :value="dict.value"
           />
         </el-select>
@@ -55,30 +55,43 @@
 
   <!-- 列表 -->
   <ContentWrap>
+    <!-- 表格工具栏 -->
+    <div class="flex justify-between items-center mb-4">
+      <div class="text-sm text-gray-600">
+        {{ t('common.total') }}: {{ total }} {{ t('common.items') }}
+      </div>
+      <RightToolbar 
+        v-model:showSearch="showSearch"
+        :columns="columns"
+        :search="true"
+        @queryTable="getList"
+      />
+    </div>
+    
     <el-table v-loading="loading" :data="list">
-      <el-table-column :label="t('wms.takingNo')" prop="takingNo" width="160" align="center" />
-      <el-table-column :label="t('wms.planNo')" prop="planNo" width="160" align="center" />
-      <el-table-column :label="t('wms.warehouse')" prop="warehouseName" width="120" align="center" />
-      <el-table-column :label="t('wms.locationCode')" prop="locationCode" width="120" align="center" />
-      <el-table-column :label="t('wms.goodsName')" prop="goodsName" min-width="180" show-overflow-tooltip />
-      <el-table-column :label="t('wms.skuCode')" prop="skuCode" width="140" align="center" />
-      <el-table-column :label="t('wms.batchNo')" prop="batchNo" width="120" align="center" />
-      <el-table-column :label="t('wms.bookQuantity')" prop="bookQuantity" width="100" align="center" />
-      <el-table-column :label="t('wms.actualQuantity')" prop="actualQuantity" width="100" align="center" />
-      <el-table-column :label="t('wms.diffQuantity')" prop="diffQuantity" width="100" align="center">
+      <el-table-column v-if="columns.takingNo.visible" :label="t('wms.takingNo')" prop="takingNo" width="160" align="center" />
+      <el-table-column v-if="columns.planNo.visible" :label="t('wms.planNo')" prop="planNo" width="160" align="center" />
+      <el-table-column v-if="columns.warehouseName.visible" :label="t('wms.warehouse')" prop="warehouseName" width="120" align="center" />
+      <el-table-column v-if="columns.locationCode.visible" :label="t('wms.locationCode')" prop="locationCode" width="120" align="center" />
+      <el-table-column v-if="columns.goodsName.visible" :label="t('wms.goodsName')" prop="goodsName" min-width="180" show-overflow-tooltip />
+      <el-table-column v-if="columns.skuCode.visible" :label="t('wms.skuCode')" prop="skuCode" width="140" align="center" />
+      <el-table-column v-if="columns.batchNo.visible" :label="t('wms.batchNo')" prop="batchNo" width="120" align="center" />
+      <el-table-column v-if="columns.bookQuantity.visible" :label="t('wms.bookQuantity')" prop="bookQuantity" width="100" align="center" />
+      <el-table-column v-if="columns.actualQuantity.visible" :label="t('wms.actualQuantity')" prop="actualQuantity" width="100" align="center" />
+      <el-table-column v-if="columns.diffQuantity.visible" :label="t('wms.diffQuantity')" prop="diffQuantity" width="100" align="center">
         <template #default="scope">
           <span :class="{ 'text-red-500': scope.row.diffQuantity && scope.row.diffQuantity < 0, 'text-green-500': scope.row.diffQuantity && scope.row.diffQuantity > 0 }">
             {{ scope.row.diffQuantity || '-' }}
           </span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.status')" prop="status" width="100" align="center" show-overflow-tooltip>
+      <el-table-column v-if="columns.status.visible" :label="t('wms.status')" prop="status" width="100" align="center" show-overflow-tooltip>
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_STOCK_TAKING_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.operator')" prop="operator" width="100" align="center" />
-      <el-table-column :label="t('common.createTime')" prop="createTime" width="160" align="center" :formatter="dateFormatter" />
+      <el-table-column v-if="columns.operator.visible" :label="t('wms.operator')" prop="operator" width="100" align="center" />
+      <el-table-column v-if="columns.createTime.visible" :label="t('common.createTime')" prop="createTime" width="160" align="center" :formatter="dateFormatter" />
       <el-table-column :label="t('action.action')" fixed="right" width="220" align="center">
         <template #default="scope">
           <el-button link type="primary" @click="openForm('update', scope.row.id)" v-if="scope.row.status === 1">
@@ -134,10 +147,15 @@
 
 <script setup lang="ts">
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { useDictI18n } from '@/hooks/web/useDictI18n'
+
+const { getDictLabel } = useDictI18n() // 字典国际化
 import { formatDate } from '@/utils/formatTime'
 import * as StockTakingApi from '@/api/wms/stockTaking'
 import * as WarehouseApi from '@/api/wms/warehouse'
 import StockTakingForm from './StockTakingForm.vue'
+import RightToolbar from '@/components/RightToolbar/index.vue'
+import { createWMSColumns } from '@/utils/wms-columns-config'
 
 defineOptions({ name: 'WmsStocktaking' })
 
@@ -147,6 +165,10 @@ const { t } = useI18n()
 const loading = ref(true)
 const list = ref([])
 const total = ref(0)
+
+// 列设置功能
+const columns = reactive(createWMSColumns(t).stocktaking)
+const showSearch = ref(true)
 const warehouseList = ref([])
 const submitDialogVisible = ref(false)
 const submitForm = ref({

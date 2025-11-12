@@ -1,6 +1,6 @@
 <template>
   <!-- 搜索工作栏 -->
-  <ContentWrap>
+  <ContentWrap v-if="showSearch">
     <el-form
       class="-mb-15px"
       :model="queryParams"
@@ -36,7 +36,7 @@
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.WMS_WAREHOUSE_TYPE)"
             :key="dict.value"
-            :label="dict.label"
+            :label="getDictLabel(dict)"
             :value="dict.value"
           />
         </el-select>
@@ -51,7 +51,7 @@
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
             :key="dict.value"
-            :label="dict.label"
+            :label="getDictLabel(dict)"
             :value="dict.value"
           />
         </el-select>
@@ -82,23 +82,75 @@
 
   <!-- 列表 -->
   <ContentWrap>
-    <el-table v-loading="loading" :data="list" @selection-change="handleSelectionChange">
+    <!-- 表格工具栏 -->
+    <div class="flex justify-between items-center mb-4">
+      <div class="text-sm text-gray-600">
+        {{ t('common.total') }}: {{ total }} {{ t('common.items') }}
+      </div>
+      <RightToolbar 
+        v-model:showSearch="showSearch"
+        :columns="columns"
+        :search="true"
+        @queryTable="getList"
+      />
+    </div>
+    
+    <el-table v-loading="loading" :data="list" stripe @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="80" />
-      <el-table-column :label="t('wms.warehouseName')" align="center" prop="warehouseName" />
-      <el-table-column :label="t('wms.warehouseType')" align="center" prop="warehouseType">
+      
+      <el-table-column 
+        v-if="columns.warehouseName.visible" 
+        :label="t('wms.warehouseName')" 
+        align="center" 
+        prop="warehouseName" 
+      />
+      
+      <el-table-column 
+        v-if="columns.warehouseType.visible" 
+        :label="t('wms.warehouseType')" 
+        align="center" 
+        prop="warehouseType"
+      >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_WAREHOUSE_TYPE" :value="scope.row.warehouseType" />
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.address')" align="center" prop="address"  show-overflow-tooltip />
-      <el-table-column :label="t('wms.contactPerson')" align="center" prop="contactPerson" />
-      <el-table-column :label="t('wms.contactPhone')" align="center" prop="contactPhone" />
-      <el-table-column :label="t('common.status')" align="center" prop="status">
+      
+      <el-table-column 
+        v-if="columns.address.visible" 
+        :label="t('wms.address')" 
+        align="center" 
+        prop="address" 
+        show-overflow-tooltip 
+      />
+      
+      <el-table-column 
+        v-if="columns.contactPerson.visible" 
+        :label="t('wms.contactPerson')" 
+        align="center" 
+        prop="contactPerson" 
+      />
+      
+      <el-table-column 
+        v-if="columns.contactPhone.visible" 
+        :label="t('wms.contactPhone')" 
+        align="center" 
+        prop="contactPhone" 
+      />
+      
+      <el-table-column 
+        v-if="columns.status.visible" 
+        :label="t('common.status')" 
+        align="center" 
+        prop="status"
+      >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
+      
       <el-table-column
+        v-if="columns.createTime.visible" 
         :label="t('common.createTime')"
         align="center"
         prop="createTime"
@@ -143,14 +195,17 @@
 <script setup lang="ts">
 import { dateFormatter } from '@/utils/formatTime'
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { useDictI18n } from '@/hooks/web/useDictI18n'
 import download from '@/utils/download'
 import * as WarehouseApi from '@/api/wms/warehouse'
 import WarehouseForm from './WarehouseForm.vue'
+import RightToolbar from '@/components/RightToolbar/index.vue'
 
 defineOptions({ name: 'WmsWarehouse' })
 
 const message = useMessage() // 消息弹窗
 const { t } = useI18n() // 国际化
+const { getDictLabel } = useDictI18n() // 字典国际化
 
 const loading = ref(true) // 列表的加载中
 const total = ref(0) // 列表的总页数
@@ -166,6 +221,20 @@ const queryParams = reactive({
 const queryFormRef = ref() // 搜索的表单
 const exportLoading = ref(false) // 导出的加载中
 const selectedIds = ref<number[]>([]) // 选中的ID数组
+
+// 列设置功能 - RuoYi风格
+const columns = reactive({
+  warehouseName: { visible: true, label: t('wms.warehouseName') },
+  warehouseType: { visible: true, label: t('wms.warehouseType') },
+  address: { visible: true, label: t('wms.address') },
+  contactPerson: { visible: true, label: t('wms.contactPerson') },
+  contactPhone: { visible: true, label: t('wms.contactPhone') },
+  status: { visible: true, label: t('common.status') },
+  createTime: { visible: true, label: t('common.createTime') }
+})
+
+// 显示搜索状态
+const showSearch = ref(true)
 
 /** 查询列表 */
 const getList = async () => {

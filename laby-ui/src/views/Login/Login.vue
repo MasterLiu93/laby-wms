@@ -106,9 +106,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
-import { underlineToHump } from '@/utils'
-import { useAppStore } from '@/store/modules/app'
+import { computed } from 'vue'
 import { useLocaleStore } from '@/store/modules/locale'
 import { ThemeSwitch } from '@/layout/components/ThemeSwitch'
 import { LocaleDropdown } from '@/layout/components/LocaleDropdown'
@@ -118,7 +116,6 @@ import { LoginStateEnum, useLoginState } from './components/useLogin'
 
 defineOptions({ name: 'Login' })
 
-const appStore = useAppStore()
 const localeStore = useLocaleStore()
 const { getLoginState, setLoginState } = useLoginState()
 
@@ -154,7 +151,7 @@ const i18nText = computed(() => ({
   overflow: hidden;
   
   .dark & {
-    background: linear-gradient(135deg, #1a1f2e 0%, #2d1b3d 100%);
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
   }
 }
 
@@ -170,6 +167,10 @@ const i18nText = computed(() => ({
   position: absolute;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.1));
+  
+  .dark & {
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.3), rgba(139, 92, 246, 0.05));
+  }
   
   &.circle-1 {
     width: 300px;
@@ -260,7 +261,8 @@ const i18nText = computed(() => ({
   
   .dark & {
     background: #1e293b;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(148, 163, 184, 0.1);
   }
   
   @media (max-width: 968px) {
@@ -435,14 +437,18 @@ const i18nText = computed(() => ({
   color: #64748b;
   margin: 0;
   font-weight: 500;
+  
+  .dark & {
+    color: #cbd5e1;
+  }
 }
 
 .form-body {
   margin-bottom: 12px;
   
-  // 自定义表单样式
+  // 自定义表单样式 - 增加间距避免验证错误提示被遮挡
   :deep(.el-form-item) {
-    margin-bottom: 14px;
+    margin-bottom: 20px;
   }
   
   :deep(.el-input__wrapper) {
@@ -451,14 +457,32 @@ const i18nText = computed(() => ({
     box-shadow: none;
     border: 1px solid #e2e8f0;
     transition: all 0.3s ease;
+    background: white;
+    
+    .dark & {
+      background: #0f172a;
+      border-color: #334155;
+      
+      .el-input__inner {
+        color: #f1f5f9;
+      }
+    }
     
     &:hover {
       border-color: #cbd5e1;
+      
+      .dark & {
+        border-color: #475569;
+      }
     }
     
     &.is-focus {
       border-color: #5eb3f6;
       box-shadow: 0 0 0 3px rgba(94, 179, 246, 0.1);
+      
+      .dark & {
+        box-shadow: 0 0 0 3px rgba(94, 179, 246, 0.2);
+      }
     }
   }
   
@@ -483,6 +507,10 @@ const i18nText = computed(() => ({
     .el-checkbox__label {
       color: #64748b;
       font-size: 13px;
+      
+      .dark & {
+        color: #cbd5e1;
+      }
     }
   }
 }
@@ -568,9 +596,9 @@ const i18nText = computed(() => ({
   transition: all 0.3s ease;
   
   .dark & {
-    background: #334155;
+    background: #0f172a;
     border-color: #475569;
-    color: #94a3b8;
+    color: #cbd5e1;
   }
   
   &:hover {
@@ -580,7 +608,8 @@ const i18nText = computed(() => ({
     transform: translateY(-2px);
     
     .dark & {
-      background: rgba(94, 179, 246, 0.15);
+      background: rgba(94, 179, 246, 0.2);
+      border-color: #5eb3f6;
     }
   }
 }
@@ -596,7 +625,7 @@ const i18nText = computed(() => ({
     line-height: 1.5;
     
     .dark & {
-      color: #64748b;
+      color: #94a3b8;
     }
     
     a {
@@ -612,6 +641,11 @@ const i18nText = computed(() => ({
 
 // 统一所有表单的输入框样式（与登录表单保持一致）
 :deep(.modern-login-form) {
+  // 增加表单项间距，避免验证错误提示被遮挡
+  .el-form-item {
+    margin-bottom: 24px;
+  }
+  
   .el-input__wrapper {
     border-radius: 12px;
     padding: 8px 12px;
@@ -653,6 +687,14 @@ const i18nText = computed(() => ({
     &:hover {
       transform: translateX(2px);
     }
+  }
+  
+  // 确保错误提示文本可见
+  .el-form-item__error {
+    position: relative;
+    top: 2px;
+    padding-top: 2px;
+    line-height: 1.4;
   }
 }
 </style>

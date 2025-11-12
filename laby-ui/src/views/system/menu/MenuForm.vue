@@ -20,6 +20,9 @@
       <el-form-item :label="t('system.menu.name')" prop="name">
         <el-input v-model="formData.name" clearable :placeholder="t('system.menu.namePlaceholder')" />
       </el-form-item>
+      <el-form-item label="菜单名称（英文）" prop="nameEn">
+        <el-input v-model="formData.nameEn" clearable placeholder="请输入菜单名称（英文）" />
+      </el-form-item>
       <el-form-item :label="t('system.menu.type')" prop="type">
         <el-radio-group v-model="formData.type">
           <el-radio-button
@@ -132,6 +135,7 @@ const formType = ref('') // 表单的类型：create - 新增；update - 修改
 const formData = ref({
   id: undefined,
   name: '',
+  nameEn: '',
   permission: '',
   type: SystemMenuTypeEnum.DIR,
   sort: Number(undefined),
@@ -234,6 +238,7 @@ const resetForm = () => {
   formData.value = {
     id: undefined,
     name: '',
+    nameEn: '',
     permission: '',
     type: SystemMenuTypeEnum.DIR,
     sort: Number(undefined),

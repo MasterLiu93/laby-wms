@@ -1,5 +1,5 @@
 <template>
-  <ContentWrap>
+  <ContentWrap v-if="showSearch">
     <!-- 搜索工作栏 -->
     <el-form
       class="-mb-15px"
@@ -27,7 +27,7 @@
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.WMS_OUTBOUND_TYPE)"
             :key="dict.value"
-            :label="dict.label"
+            :label="getDictLabel(dict)"
             :value="dict.value"
           />
         </el-select>
@@ -57,7 +57,7 @@
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.WMS_OUTBOUND_STATUS)"
             :key="dict.value"
-            :label="dict.label"
+            :label="getDictLabel(dict)"
             :value="dict.value"
           />
         </el-select>
@@ -90,22 +90,78 @@
 
   <!-- 列表 -->
   <ContentWrap>
+    <!-- 表格工具栏 -->
+    <div class="flex justify-between items-center mb-4">
+      <div class="text-sm text-gray-600">
+        {{ t('common.total') }}: {{ total }} {{ t('common.items') }}
+      </div>
+      <RightToolbar 
+        v-model:showSearch="showSearch"
+        :columns="columns"
+        :search="true"
+        @queryTable="getList"
+      />
+    </div>
+    
     <el-table v-loading="loading" :data="list" stripe>
-      <el-table-column :label="t('wms.outboundNo')" align="center" prop="outboundNo" min-width="150" />
-      <el-table-column :label="t('common.type')" align="center" width="130">
+      <el-table-column 
+        v-if="columns.outboundNo.visible" 
+        :label="t('wms.outboundNo')" 
+        align="center" 
+        prop="outboundNo" 
+        min-width="150" 
+      />
+      <el-table-column 
+        v-if="columns.outboundType.visible" 
+        :label="t('common.type')" 
+        align="center" 
+        width="130"
+      >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_OUTBOUND_TYPE" :value="scope.row.outboundType" />
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.warehouse')" align="center" prop="warehouseName" width="130" show-overflow-tooltip />
-      <el-table-column :label="t('wms.customerName')" align="center" prop="customerName" width="150" show-overflow-tooltip>
+      <el-table-column 
+        v-if="columns.warehouseName.visible" 
+        :label="t('wms.warehouse')" 
+        align="center" 
+        prop="warehouseName" 
+        min-width="120" 
+        show-overflow-tooltip 
+      />
+      <el-table-column 
+        v-if="columns.customerName.visible" 
+        :label="t('wms.customer')" 
+        align="center" 
+        prop="customerName" 
+        min-width="160" 
+        show-overflow-tooltip 
+      >
         <template #default="scope">
           <span class="text-gray-600">{{ scope.row.customerName || '-' }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.totalQuantity')" align="center" prop="totalQuantity" width="90" />
-      <el-table-column :label="t('wms.pickedQuantity')" align="center" prop="pickedQuantity" width="90" />
-      <el-table-column :label="t('wms.totalAmount')" align="center" prop="totalAmount" width="180">
+      <el-table-column 
+        v-if="columns.totalQuantity.visible" 
+        :label="t('wms.totalQuantity')" 
+        align="center" 
+        prop="totalQuantity" 
+        width="90" 
+      />
+      <el-table-column 
+        v-if="columns.pickedQuantity.visible" 
+        :label="t('wms.pickedQuantity')" 
+        align="center" 
+        prop="pickedQuantity" 
+        width="90" 
+      />
+      <el-table-column 
+        v-if="columns.totalAmount.visible" 
+        :label="t('wms.totalAmount')" 
+        align="center" 
+        prop="totalAmount" 
+        width="180"
+      >
         <template #default="scope">
           <span v-if="scope.row.totalAmount" class="text-red-500 font-semibold">
             ¥{{ scope.row.totalAmount.toFixed(2) }}
@@ -113,12 +169,24 @@
           <span v-else class="text-gray-400">-</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('common.status')" align="center" width="120">
+      <el-table-column 
+        v-if="columns.status.visible" 
+        :label="t('common.status')" 
+        align="center" 
+        width="120"
+      >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_OUTBOUND_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
-      <el-table-column :label="t('common.createTime')" align="center" prop="createTime" :formatter="dateFormatter" width="180" />
+      <el-table-column 
+        v-if="columns.createTime.visible" 
+        :label="t('common.createTime')" 
+        align="center" 
+        prop="createTime" 
+        :formatter="dateFormatter" 
+        width="180" 
+      />
       <el-table-column :label="t('action.action')" align="center" fixed="right" min-width="160">
         <template #default="scope">
           <el-button link type="primary" @click="openDetail(scope.row)" v-hasPermi="['wms:outbound:query']">
@@ -167,11 +235,16 @@
 <script setup lang="ts" name="WmsOutbound">
 import { dateFormatter } from '@/utils/formatTime'
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { useDictI18n } from '@/hooks/web/useDictI18n'
+
+const { getDictLabel } = useDictI18n() // 字典国际化
 import { getOutboundPage, deleteOutbound, auditOutbound, shipOutbound, cancelOutbound } from '@/api/wms/outbound'
 import { getWarehouseSimpleList } from '@/api/wms/warehouse'
 import OutboundForm from './OutboundForm.vue'
 import OutboundDetail from './OutboundDetail.vue'
 import OutboundPick from './OutboundPick.vue'
+import RightToolbar from '@/components/RightToolbar/index.vue'
+import { createWMSColumns } from '@/utils/wms-columns-config'
 
 const message = useMessage() // 消息弹窗
 const { t } = useI18n() // 国际化
@@ -189,6 +262,12 @@ const queryParams = reactive({
   createTime: []
 })
 const queryFormRef = ref() // 搜索的表单
+
+// 列设置功能 - RuoYi风格
+const columns = reactive(createWMSColumns(t).outbound)
+
+// 显示搜索状态
+const showSearch = ref(true)
 const warehouseList = ref([]) // 仓库列表
 
 /** 查询列表 */

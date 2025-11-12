@@ -21,6 +21,7 @@ export default {
   exceptionRemarkPlaceholder: '请输入异常说明',
   viewException: '查看异常',
   executePick: '执行拣货',
-  executePickTitle: '执行拣货'
+  executePickTitle: '执行拣货',
+  assignedUser: '分配人员'
 }
 

@@ -21,6 +21,7 @@ export default {
   exceptionRemarkPlaceholder: 'Please enter exception remark',
   viewException: 'View Exception',
   executePick: 'Execute Pick',
-  executePickTitle: 'Execute Pick'
+  executePickTitle: 'Execute Pick',
+  assignedUser: 'Assigned User'
 }
 

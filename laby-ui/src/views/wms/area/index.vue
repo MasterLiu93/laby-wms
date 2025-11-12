@@ -1,5 +1,5 @@
 <template>
-  <ContentWrap>
+  <ContentWrap v-if="showSearch">
     <!-- 搜索工作栏 -->
     <el-form
       class="-mb-15px"
@@ -46,7 +46,7 @@
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
             :key="dict.value"
-            :label="dict.label"
+            :label="getDictLabel(dict)"
             :value="dict.value"
           />
         </el-select>
@@ -77,22 +77,71 @@
 
   <!-- 列表 -->
   <ContentWrap>
-    <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
-      <el-table-column :label="t('wms.areaName')" align="center" prop="areaName" />
-      <el-table-column :label="t('wms.warehouse')" align="center" prop="warehouseName" />
-      <el-table-column :label="t('wms.areaType')" align="center" prop="areaType" width="120px">
+    <!-- 表格工具栏 -->
+    <div class="flex justify-between items-center mb-4">
+      <div class="text-sm text-gray-600">
+        {{ t('common.total') }}: {{ total }} {{ t('common.items') }}
+      </div>
+      <RightToolbar 
+        v-model:showSearch="showSearch"
+        :columns="columns"
+        :search="true"
+        @queryTable="getList"
+      />
+    </div>
+    
+    <el-table v-loading="loading" :data="list" stripe show-overflow-tooltip>
+      <el-table-column 
+        v-if="columns.areaName.visible" 
+        :label="t('wms.areaName')" 
+        align="center" 
+        prop="areaName" 
+      />
+      <el-table-column 
+        v-if="columns.warehouseName.visible" 
+        :label="t('wms.warehouse')" 
+        align="center" 
+        prop="warehouseName" 
+        width="200px" 
+      />
+      <el-table-column 
+        v-if="columns.areaType.visible" 
+        :label="t('wms.areaType')" 
+        align="center" 
+        prop="areaType" 
+        width="120px"
+      >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_WAREHOUSE_AREA_TYPE" :value="scope.row.areaType" />
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.floor')" align="center" prop="floor" width="80px" />
-      <el-table-column :label="t('wms.areaSize')" align="center" prop="areaSize" width="120px" />
-      <el-table-column :label="t('common.status')" align="center" prop="status" width="100px">
+      <el-table-column 
+        v-if="columns.floor.visible" 
+        :label="t('wms.floor')" 
+        align="center" 
+        prop="floor" 
+        width="80px" 
+      />
+      <el-table-column 
+        v-if="columns.areaSize.visible" 
+        :label="t('wms.areaSize')" 
+        align="center" 
+        prop="areaSize" 
+        width="120px" 
+      />
+      <el-table-column 
+        v-if="columns.status.visible" 
+        :label="t('common.status')" 
+        align="center" 
+        prop="status" 
+        width="100px"
+      >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
       <el-table-column
+        v-if="columns.createTime.visible" 
         :label="t('common.createTime')"
         align="center"
         prop="createTime"
@@ -137,15 +186,19 @@
 import { dateFormatter } from '@/utils/formatTime'
 import download from '@/utils/download'
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { useDictI18n } from '@/hooks/web/useDictI18n'
 import * as WarehouseAreaApi from '@/api/wms/area'
 import * as WarehouseApi from '@/api/wms/warehouse'
 import WarehouseAreaForm from './WarehouseAreaForm.vue'
+import RightToolbar from '@/components/RightToolbar/index.vue'
+import { createWMSColumns } from '@/utils/wms-columns-config'
 
 /** 库区管理 列表 */
 defineOptions({ name: 'WmsWarehouseArea' })
 
 const message = useMessage() // 消息弹窗
 const { t } = useI18n() // 国际化
+const { getDictLabel } = useDictI18n() // 字典国际化
 
 const loading = ref(true) // 列表的加载中
 const list = ref([]) // 列表的数据
@@ -160,6 +213,12 @@ const queryParams = reactive({
   status: undefined
 })
 const queryFormRef = ref() // 搜索的表单
+
+// 列设置功能 - RuoYi风格
+const columns = reactive(createWMSColumns(t).area)
+
+// 显示搜索状态
+const showSearch = ref(true)
 const exportLoading = ref(false) // 导出的加载中
 const warehouseList = ref([]) // 仓库列表
 

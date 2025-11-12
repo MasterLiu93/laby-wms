@@ -1,5 +1,5 @@
 <template>
-  <ContentWrap>
+  <ContentWrap v-if="showSearch">
     <!-- 搜索工作栏 -->
     <el-form
       ref="queryFormRef"
@@ -51,7 +51,7 @@
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.WMS_PICKING_TASK_STATUS)"
             :key="dict.value"
-            :label="dict.label"
+            :label="getDictLabel(dict)"
             :value="dict.value"
           />
         </el-select>
@@ -82,16 +82,28 @@
 
   <!-- 列表 -->
   <ContentWrap>
+    <!-- 表格工具栏 -->
+    <div class="flex justify-between items-center mb-4">
+      <div class="text-sm text-gray-600">
+        {{ t('common.total') }}: {{ total }} {{ t('common.items') }}
+      </div>
+      <RightToolbar 
+        v-model:showSearch="showSearch"
+        :columns="columns"
+        :search="true"
+        @queryTable="getList"
+      />
+    </div>
     <el-table v-loading="loading" :data="list" stripe>
-      <el-table-column align="center" :label="t('wms.taskNo')" min-width="160" prop="taskNo" show-overflow-tooltip />
+      <el-table-column v-if="columns.taskNo.visible" align="center" :label="t('wms.taskNo')" min-width="160" prop="taskNo" show-overflow-tooltip />
       <el-table-column align="center" :label="t('wms.outboundNo')" min-width="160" prop="outboundNo" show-overflow-tooltip />
-      <el-table-column align="center" :label="t('wms.goodsInfo')" min-width="200" show-overflow-tooltip>
+      <el-table-column v-if="columns.goodsName.visible" align="center" :label="t('wms.goodsInfo')" min-width="200" show-overflow-tooltip>
         <template #default="{ row }">
           <div>{{ row.goodsName }}</div>
           <div class="text-xs text-gray-500">SKU: {{ row.skuCode }}</div>
         </template>
       </el-table-column>
-      <el-table-column align="center" :label="t('wms.location')" min-width="150" show-overflow-tooltip>
+      <el-table-column v-if="columns.locationCode.visible" align="center" :label="t('wms.location')" min-width="150" show-overflow-tooltip>
         <template #default="{ row }">
           <div v-if="row.rowNo">
             <div class="font-semibold">
@@ -109,23 +121,23 @@
           {{ row.batchNo || '-' }}
         </template>
       </el-table-column>
-      <el-table-column align="center" :label="t('wms.planQuantity')" min-width="100" prop="planQuantity">
+      <el-table-column v-if="columns.quantity.visible" align="center" :label="t('wms.planQuantity')" min-width="100" prop="planQuantity">
         <template #default="{ row }">
           <span class="font-medium">{{ row.planQuantity }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" :label="t('wms.actualQuantity')" min-width="100" prop="actualQuantity">
+      <el-table-column v-if="columns.pickedQuantity.visible" align="center" :label="t('wms.actualQuantity')" min-width="100" prop="actualQuantity">
         <template #default="{ row }">
           <span v-if="row.actualQuantity" class="text-primary font-medium">{{ row.actualQuantity }}</span>
           <span v-else class="text-gray-400">-</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" :label="t('wms.picker')" min-width="100" prop="pickerName">
+      <el-table-column v-if="columns.assignedUser.visible" align="center" :label="t('wms.picker')" min-width="100" prop="pickerName">
         <template #default="{ row }">
           {{ row.pickerName || '-' }}
         </template>
       </el-table-column>
-      <el-table-column align="center" :label="t('wms.taskStatus')" min-width="100" prop="status">
+      <el-table-column v-if="columns.taskStatus.visible" align="center" :label="t('wms.taskStatus')" min-width="100" prop="status">
         <template #default="{ row }">
           <dict-tag :type="DICT_TYPE.WMS_PICKING_TASK_STATUS" :value="row.status" />
         </template>
@@ -142,6 +154,7 @@
         </template>
       </el-table-column>
       <el-table-column
+        v-if="columns.createTime.visible"
         :formatter="dateFormatter"
         align="center"
         :label="t('common.createTime')"
@@ -309,7 +322,7 @@
             <el-option
               v-for="dict in getIntDictOptions(DICT_TYPE.WMS_PICKING_EXCEPTION_TYPE)"
               :key="dict.value"
-              :label="dict.label"
+              :label="getDictLabel(dict)"
               :value="dict.value"
             />
           </el-select>
@@ -341,13 +354,19 @@
 
 <script lang="ts" setup>
 import { dateFormatter } from '@/utils/formatTime'
-import { DICT_TYPE, getIntDictOptions, getDictOptions } from '@/utils/dict'
+import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { useDictI18n } from '@/hooks/web/useDictI18n'
+
+const { getDictLabel } = useDictI18n() // 字典国际化
 import * as PickingTaskApi from '@/api/wms/pickingTask'
 import * as WarehouseApi from '@/api/wms/warehouse'
 import * as UserApi from '@/api/system/user'
+import RightToolbar from '@/components/RightToolbar/index.vue'
+import { createWMSColumns } from '@/utils/wms-columns-config'
 
 defineOptions({ name: 'WmsPickingTask' })
 
+// ...
 const message = useMessage()
 const { t } = useI18n()
 
@@ -365,6 +384,10 @@ const queryParams = reactive({
   createTime: []
 })
 const queryFormRef = ref()
+
+// 列设置功能
+const columns = reactive(createWMSColumns(t).pickingTask)
+const showSearch = ref(true)
 
 // 仓库列表
 const warehouseList = ref([])

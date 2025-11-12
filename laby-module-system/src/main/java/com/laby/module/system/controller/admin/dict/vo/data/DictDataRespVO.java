@@ -27,6 +27,10 @@ public class DictDataRespVO {
     @ExcelProperty("字典标签")
     private String label;
 
+    @Schema(description = "字典标签（英文）", example = "Yudao")
+    @ExcelProperty("字典标签（英文）")
+    private String labelEn;
+
     @Schema(description = "字典值", requiredMode = Schema.RequiredMode.REQUIRED, example = "iocoder")
     @ExcelProperty("字典键值")
     private String value;

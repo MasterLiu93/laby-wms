@@ -11,22 +11,22 @@
   @date 2025-10-28
 -->
 <template>
-  <ContentWrap>
+  <ContentWrap v-if="showSearch">
     <!-- 搜索工作栏 -->
     <el-form class="-mb-15px" :model="queryParams" ref="queryFormRef" :inline="true">
-      <el-form-item label="快照日期" prop="snapshotDateRange">
+      <el-form-item :label="t('wms.snapshotDate')" prop="snapshotDateRange">
         <el-date-picker
           v-model="queryParams.snapshotDateRange"
           value-format="YYYY-MM-DD"
           type="daterange"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
+          :start-placeholder="t('common.startDate')"
+          :end-placeholder="t('common.endDate')"
           class="!w-240px"
         />
       </el-form-item>
       
-      <el-form-item label="仓库" prop="warehouseId">
-        <el-select v-model="queryParams.warehouseId" placeholder="请选择仓库" clearable class="!w-240px">
+      <el-form-item :label="t('wms.warehouse')" prop="warehouseId">
+        <el-select v-model="queryParams.warehouseId" :placeholder="t('wms.warehousePlaceholder')" clearable class="!w-240px">
           <el-option
             v-for="warehouse in warehouseList"
             :key="warehouse.id"
@@ -36,8 +36,8 @@
         </el-select>
       </el-form-item>
       
-      <el-form-item label="商品" prop="goodsId">
-        <el-select v-model="queryParams.goodsId" placeholder="请选择商品" clearable class="!w-240px" filterable>
+      <el-form-item :label="t('wms.goods')" prop="goodsId">
+        <el-select v-model="queryParams.goodsId" :placeholder="t('wms.goodsPlaceholder')" clearable class="!w-240px" filterable>
           <el-option
             v-for="goods in goodsList"
             :key="goods.id"
@@ -48,40 +48,47 @@
       </el-form-item>
       
       <el-form-item>
-        <el-button @click="handleQuery"><Icon icon="ep:search" class="mr-5px" />搜索</el-button>
-        <el-button @click="resetQuery"><Icon icon="ep:refresh" class="mr-5px" />重置</el-button>
+        <el-button @click="handleQuery"><Icon icon="ep:search" class="mr-5px" />{{ t('common.query') }}</el-button>
+        <el-button @click="resetQuery"><Icon icon="ep:refresh" class="mr-5px" />{{ t('common.reset') }}</el-button>
       </el-form-item>
     </el-form>
   </ContentWrap>
 
   <!-- 列表 -->
   <ContentWrap>
+    <!-- 表格工具栏 -->
+    <div class="flex justify-between items-center mb-4">
+      <div class="text-sm text-gray-600">
+        {{ t('common.total') }}: {{ total }} {{ t('common.items') }}
+      </div>
+      <RightToolbar v-model:showSearch="showSearch" :search="true" @queryTable="getList" />
+    </div>
     <el-table v-loading="loading" :data="list" stripe>
-      <el-table-column label="快照日期" prop="snapshotDate" width="120" fixed="left" />
-      <el-table-column label="仓库" prop="warehouseName" width="120" />
-      <el-table-column label="商品信息" min-width="200">
+      <el-table-column :label="t('wms.snapshotDate')" prop="snapshotDate" width="120" fixed="left" />
+      <el-table-column :label="t('wms.warehouse')" prop="warehouseName" width="120" />
+      <el-table-column :label="t('wms.goodsInfo')" min-width="200">
         <template #default="scope">
           <div>{{ scope.row.skuCode }}</div>
           <div class="text-gray-500 text-xs">{{ scope.row.goodsName }}</div>
         </template>
       </el-table-column>
-      <el-table-column label="库存数量" prop="quantity" width="120" align="right">
+      <el-table-column :label="t('wms.quantity')" prop="quantity" width="120" align="right">
         <template #default="scope">
           <span class="font-medium">{{ scope.row.quantity }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="锁定数量" prop="lockQuantity" width="120" align="right">
+      <el-table-column :label="t('wms.lockQuantity')" prop="lockQuantity" width="120" align="right">
         <template #default="scope">
           <span v-if="scope.row.lockQuantity > 0" class="text-orange-500">{{ scope.row.lockQuantity }}</span>
           <span v-else class="text-gray-400">0</span>
         </template>
       </el-table-column>
-      <el-table-column label="可用数量" prop="availableQuantity" width="120" align="right">
+      <el-table-column :label="t('wms.availableQuantity')" prop="availableQuantity" width="120" align="right">
         <template #default="scope">
           <span class="text-green-600 font-medium">{{ scope.row.availableQuantity }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" prop="createTime" width="160" :formatter="dateFormatter" />
+      <el-table-column :label="t('common.createTime')" prop="createTime" width="160" :formatter="dateFormatter" />
     </el-table>
     
     <!-- 分页 -->
@@ -99,6 +106,7 @@ import * as InventorySnapshotApi from '@/api/wms/inventory-snapshot'
 import * as WarehouseApi from '@/api/wms/warehouse'
 import * as GoodsApi from '@/api/wms/goods'
 import { dateFormatter } from '@/utils/formatTime'
+import RightToolbar from '@/components/RightToolbar/index.vue'
 
 defineOptions({ name: 'WmsInventorySnapshot' })
 
@@ -110,6 +118,7 @@ const list = ref([])
 const total = ref(0)
 const warehouseList = ref([])
 const goodsList = ref([])
+const showSearch = ref(true)
 
 // 查询参数
 const queryParams = reactive({

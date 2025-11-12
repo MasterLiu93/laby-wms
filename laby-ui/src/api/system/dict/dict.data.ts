@@ -4,6 +4,7 @@ export interface DictDataVO {
   id: number
   sort: number
   label: string
+  labelEn?: string
   value: string
   dictType: string
   status: number

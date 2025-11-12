@@ -9,6 +9,7 @@ import { getSimpleDictDataList } from '@/api/system/dict/dict.data'
 export interface DictValueType {
   value: any
   label: string
+  labelEn?: string
   clorType?: string
   cssClass?: string
 }
@@ -58,6 +59,7 @@ export const useDictStore = defineStore('dict', {
           dictDataMap[dictData.dictType].push({
             value: dictData.value,
             label: dictData.label,
+            labelEn: dictData.labelEn,
             colorType: dictData.colorType,
             cssClass: dictData.cssClass
           })
@@ -88,6 +90,7 @@ export const useDictStore = defineStore('dict', {
         dictDataMap[dictData.dictType].push({
           value: dictData.value,
           label: dictData.label,
+          labelEn: dictData.labelEn,
           colorType: dictData.colorType,
           cssClass: dictData.cssClass
         })

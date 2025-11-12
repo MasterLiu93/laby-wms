@@ -27,7 +27,7 @@
               <el-option
                 v-for="dict in getIntDictOptions(DICT_TYPE.WMS_OUTBOUND_TYPE)"
                 :key="dict.value"
-                :label="dict.label"
+                :label="getDictLabel(dict)"
                 :value="dict.value"
               />
             </el-select>
@@ -275,9 +275,12 @@
 
 <script setup lang="ts">
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { useDictI18n } from '@/hooks/web/useDictI18n'
 import { getOutbound, createOutbound, updateOutbound } from '@/api/wms/outbound'
 import { getWarehouseSimpleList } from '@/api/wms/warehouse'
 import * as AreaApi from '@/api/wms/area'
+
+const { getDictLabel } = useDictI18n() // 字典国际化
 import * as LocationApi from '@/api/wms/location'
 import { getInventoryPage } from '@/api/wms/inventory'
 import { getCustomerSimpleList } from '@/api/wms/customer'

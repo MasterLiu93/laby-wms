@@ -88,29 +88,23 @@
       />
       <el-col :span="24" class="px-10px">
         <el-form-item>
-          <el-row :gutter="5" justify="space-between" style="width: 100%">
-            <el-col :span="8">
-              <XButton
-                :title="t('login.btnMobile')"
-                class="w-full"
-                @click="setLoginState(LoginStateEnum.MOBILE)"
-              />
-            </el-col>
-            <el-col :span="8">
-              <XButton
-                :title="t('login.btnQRCode')"
-                class="w-full"
-                @click="setLoginState(LoginStateEnum.QR_CODE)"
-              />
-            </el-col>
-            <el-col :span="8">
-              <XButton
-                :title="t('login.btnRegister')"
-                class="w-full"
-                @click="setLoginState(LoginStateEnum.REGISTER)"
-              />
-            </el-col>
-          </el-row>
+          <div class="login-action-buttons">
+            <XButton
+              :title="t('login.btnMobile')"
+              class="action-btn"
+              @click="setLoginState(LoginStateEnum.MOBILE)"
+            />
+            <XButton
+              :title="t('login.btnQRCode')"
+              class="action-btn"
+              @click="setLoginState(LoginStateEnum.QR_CODE)"
+            />
+            <XButton
+              :title="t('login.btnRegister')"
+              class="action-btn"
+              @click="setLoginState(LoginStateEnum.REGISTER)"
+            />
+          </div>
         </el-form-item>
       </el-col>
       <el-divider content-position="center">{{ t('login.otherLogin') }}</el-divider>
@@ -397,6 +391,24 @@ onMounted(() => {
     transition: all 0.3s ease;
     &:hover {
       transform: translateX(2px);
+    }
+  }
+}
+
+// 登录操作按钮弹性布局
+.login-action-buttons {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  flex-wrap: wrap;
+  
+  .action-btn {
+    flex: 1;
+    min-width: 100px;
+    
+    // 当按钮文本过长时，允许换行到下一行
+    @media (max-width: 400px) {
+      flex-basis: 100%;
     }
   }
 }

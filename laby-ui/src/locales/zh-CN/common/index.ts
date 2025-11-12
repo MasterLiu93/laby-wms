@@ -43,6 +43,12 @@ export default {
     shrink: '收起',
     expand: '展开',
     confirmTitle: '系统提示',
+    confirm: '确认',
+    selectAll: '全选',
+    columnSetting: '列设置',
+    columnDisplay: '列展示',
+    total: '总共',
+    items: '条',
     exportMessage: '是否确认导出数据项？',
     importMessage: '是否确认导入数据项？',
     createSuccess: '新增成功',
@@ -83,7 +89,10 @@ export default {
     statusPlaceholder: '请选择状态',
     selectDateTimeText: '选择日期时间',
     import: '导入',
-    export: '导出'
+    export: '导出',
+    refreshing: '刷新中...',
+    refreshSuccess: '刷新成功',
+    refreshFailed: '刷新失败'
   },
   lock: {
     lockScreen: '锁定屏幕',

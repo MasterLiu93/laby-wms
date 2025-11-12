@@ -1,6 +1,5 @@
 <template>
-  <ContentWrap>
-    <!-- 搜索工作栏 -->
+  <ContentWrap v-if="showSearch">
     <el-form
       class="-mb-15px"
       :model="queryParams"
@@ -52,7 +51,7 @@
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
             :key="dict.value"
-            :label="dict.label"
+            :label="getDictLabel(dict)"
             :value="dict.value"
           />
         </el-select>
@@ -73,11 +72,42 @@
 
   <!-- 列表 -->
   <ContentWrap>
+    <!-- 表格工具栏 -->
+    <div class="flex justify-between items-center mb-4">
+      <div class="text-sm text-gray-600">
+        {{ t('common.total') }}: {{ total }} {{ t('common.items') }}
+      </div>
+      <RightToolbar 
+        v-model:showSearch="showSearch"
+        :columns="columns"
+        :search="true"
+        @queryTable="getList"
+      />
+    </div>
+    
     <el-table v-loading="loading" :data="list" stripe>
-      <el-table-column :label="t('wms.skuCode')" align="center" prop="skuCode" width="150px" />
-      <el-table-column :label="t('wms.goodsName')" align="center" prop="goodsName" min-width="200px" show-overflow-tooltip />
+      <el-table-column 
+        v-if="columns.skuCode.visible" 
+        :label="t('wms.skuCode')" 
+        align="center" 
+        prop="skuCode" 
+        width="150px" 
+      />
+      <el-table-column 
+        v-if="columns.goodsName.visible" 
+        :label="t('wms.goodsName')" 
+        align="center" 
+        prop="goodsName" 
+        min-width="200px" 
+        show-overflow-tooltip 
+      />
       
-      <el-table-column :label="t('wms.category')" align="center" width="130px">
+      <el-table-column 
+        v-if="columns.category.visible" 
+        :label="t('wms.category')" 
+        align="center" 
+        width="130px"
+      >
         <template #default="scope">
           <el-tag v-if="scope.row.categoryName" type="info" size="small">
             {{ scope.row.categoryName }}
@@ -86,31 +116,61 @@
         </template>
       </el-table-column>
       
-      <el-table-column :label="t('wms.brand')" align="center" prop="brand" width="120px">
+      <el-table-column 
+        v-if="columns.brand.visible" 
+        :label="t('wms.brand')" 
+        align="center" 
+        prop="brand" 
+        width="120px"
+      >
         <template #default="scope">
           {{ scope.row.brand || '-' }}
         </template>
       </el-table-column>
       
-      <el-table-column :label="t('wms.model')" align="center" prop="model" width="120px" show-overflow-tooltip>
+      <el-table-column 
+        v-if="columns.model.visible" 
+        :label="t('wms.model')" 
+        align="center" 
+        prop="model" 
+        width="120px" 
+        show-overflow-tooltip
+      >
         <template #default="scope">
           {{ scope.row.model || '-' }}
         </template>
       </el-table-column>
       
-      <el-table-column :label="t('wms.unit')" align="center" width="90px">
+      <el-table-column 
+        v-if="columns.unit.visible" 
+        :label="t('wms.unit')" 
+        align="center" 
+        width="80px"
+      >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_GOODS_UNIT" :value="scope.row.unit" />
         </template>
       </el-table-column>
       
-      <el-table-column :label="t('wms.spec')" align="center" prop="spec" width="150px" show-overflow-tooltip>
+      <el-table-column 
+        v-if="columns.spec.visible" 
+        :label="t('wms.spec')" 
+        align="center" 
+        prop="spec" 
+        width="120px"
+      >
         <template #default="scope">
           {{ scope.row.spec || '-' }}
         </template>
       </el-table-column>
       
-      <el-table-column :label="t('wms.safetyStock')" align="center" prop="safetyStock" width="100px">
+      <el-table-column 
+        v-if="columns.safetyStock.visible" 
+        :label="t('wms.safetyStock')" 
+        align="center" 
+        prop="safetyStock" 
+        width="100px"
+      >
         <template #default="scope">
           <el-tag v-if="scope.row.safetyStock > 0" type="warning" size="small">
             {{ scope.row.safetyStock }}
@@ -119,7 +179,12 @@
         </template>
       </el-table-column>
       
-      <el-table-column :label="t('wms.batchSerial')" align="center" width="120px">
+      <el-table-column 
+        v-if="columns.batchSerial.visible" 
+        :label="t('wms.batchSerial')" 
+        align="center" 
+        width="120px"
+      >
         <template #default="scope">
           <div class="flex gap-1 justify-center">
             <el-tag v-if="scope.row.needBatch" type="warning" size="small">{{ t('wms.batch') }}</el-tag>
@@ -129,13 +194,24 @@
         </template>
       </el-table-column>
       
-      <el-table-column :label="t('common.status')" align="center" width="80px">
+      <el-table-column 
+        v-if="columns.status.visible" 
+        :label="t('common.status')" 
+        align="center" 
+        width="80px"
+      >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
       
-      <el-table-column :label="t('common.createTime')" align="center" prop="createTime" width="180px">
+      <el-table-column 
+        v-if="columns.createTime.visible" 
+        :label="t('common.createTime')" 
+        align="center" 
+        prop="createTime" 
+        width="180px"
+      >
         <template #default="scope">
           {{ formatDate(scope.row.createTime) }}
         </template>
@@ -243,10 +319,14 @@
 
 <script setup lang="ts">
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { useDictI18n } from '@/hooks/web/useDictI18n'
+
+const { getDictLabel } = useDictI18n() // 字典国际化
 import { handleTree } from '@/utils/tree'
 import * as GoodsApi from '@/api/wms/goods'
 import * as GoodsCategoryApi from '@/api/wms/category'
 import GoodsForm from './GoodsForm.vue'
+import RightToolbar from '@/components/RightToolbar/index.vue'
 
 /** 商品信息 列表 */
 defineOptions({ name: 'WmsGoods' })
@@ -268,6 +348,24 @@ const queryParams = reactive({
 })
 const queryFormRef = ref() // 搜索的表单
 const categoryTree = ref([]) // 分类树
+
+// 列设置功能 - RuoYi风格
+const columns = reactive({
+  skuCode: { visible: true, label: t('wms.skuCode') },
+  goodsName: { visible: true, label: t('wms.goodsName') },
+  category: { visible: true, label: t('wms.category') },
+  brand: { visible: true, label: t('wms.brand') },
+  model: { visible: true, label: t('wms.model') },
+  unit: { visible: true, label: t('wms.unit') },
+  spec: { visible: true, label: t('wms.spec') },
+  safetyStock: { visible: true, label: t('wms.safetyStock') },
+  batchSerial: { visible: true, label: t('wms.batchSerial') },
+  status: { visible: true, label: t('common.status') },
+  createTime: { visible: true, label: t('common.createTime') }
+})
+
+// 显示搜索状态
+const showSearch = ref(true)
 
 // 详情相关
 const detailVisible = ref(false)

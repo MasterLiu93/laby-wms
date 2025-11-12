@@ -43,7 +43,7 @@
               <el-option
                 v-for="dict in getIntDictOptions(DICT_TYPE.WMS_STOCK_MOVE_TYPE)"
                 :key="dict.value"
-                :label="dict.label"
+                :label="getDictLabel(dict)"
                 :value="dict.value"
               />
             </el-select>
@@ -157,9 +157,12 @@
 
 <script setup lang="ts">
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { useDictI18n } from '@/hooks/web/useDictI18n'
 import * as StockMoveApi from '@/api/wms/stockMove'
 import * as WarehouseApi from '@/api/wms/warehouse'
 import * as WarehouseLocationApi from '@/api/wms/location'
+
+const { getDictLabel } = useDictI18n() // 字典国际化
 import * as GoodsApi from '@/api/wms/goods'
 
 defineOptions({ name: 'StockMoveForm' })

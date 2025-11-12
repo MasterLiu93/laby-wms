@@ -16,6 +16,10 @@ public class DictDataRespDTO {
      */
     private String label;
     /**
+     * 字典标签（英文）
+     */
+    private String labelEn;
+    /**
      * 字典值
      */
     private String value;

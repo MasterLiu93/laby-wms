@@ -25,7 +25,7 @@
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.WMS_WAREHOUSE_AREA_TYPE)"
             :key="dict.value"
-            :label="dict.label"
+            :label="getDictLabel(dict)"
             :value="dict.value"
           />
         </el-select>
@@ -43,7 +43,7 @@
             :key="dict.value"
             :label="dict.value"
           >
-            {{ dict.label }}
+            {{ getDictLabel(dict) }}
           </el-radio>
         </el-radio-group>
       </el-form-item>
@@ -59,6 +59,7 @@
 </template>
 <script setup lang="ts">
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { useDictI18n } from '@/hooks/web/useDictI18n'
 import * as WarehouseAreaApi from '@/api/wms/area'
 import * as WarehouseApi from '@/api/wms/warehouse'
 
@@ -67,6 +68,7 @@ defineOptions({ name: 'WarehouseAreaForm' })
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
+const { getDictLabel } = useDictI18n() // 字典国际化
 
 const dialogVisible = ref(false) // 弹窗的是否展示
 const dialogTitle = ref('') // 弹窗的标题

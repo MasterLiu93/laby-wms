@@ -14,7 +14,7 @@
               <el-option
                 v-for="dict in getIntDictOptions(DICT_TYPE.WMS_INBOUND_TYPE)"
                 :key="dict.value"
-                :label="dict.label"
+                :label="getDictLabel(dict)"
                 :value="dict.value"
               />
             </el-select>
@@ -268,16 +268,21 @@
 
 <script setup lang="ts">
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { useDictI18n } from '@/hooks/web/useDictI18n'
 import { getInbound, createInbound, updateInbound } from '@/api/wms/inbound'
 import { getWarehouseSimpleList } from '@/api/wms/warehouse'
-import * as SupplierApi from '@/api/wms/supplier'
 import * as AreaApi from '@/api/wms/area'
 import * as LocationApi from '@/api/wms/location'
+import * as SupplierApi from '@/api/wms/supplier'
 import GoodsSelector from './GoodsSelector.vue'
 import dayjs from 'dayjs'
 
+/** 入库单 表单 */
+defineOptions({ name: 'InboundForm' })
+
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
+const { getDictLabel } = useDictI18n() // 字典国际化
 
 const dialogVisible = ref(false) // 弹窗的是否展示
 const dialogTitle = ref('') // 弹窗的标题

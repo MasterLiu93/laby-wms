@@ -12,7 +12,7 @@
   @date 2025-10-28
 -->
 <template>
-  <ContentWrap>
+  <ContentWrap v-show="showSearch">
     <!-- 搜索工作栏 -->
     <el-form class="-mb-15px" :model="queryParams" ref="queryFormRef" :inline="true">
       <el-form-item :label="t('wms.customerCode')" prop="customerCode">
@@ -41,7 +41,7 @@
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.WMS_CUSTOMER_TYPE)"
             :key="dict.value"
-            :label="dict.label"
+            :label="getDictLabel(dict)"
             :value="dict.value"
           />
         </el-select>
@@ -56,7 +56,7 @@
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.WMS_CUSTOMER_LEVEL)"
             :key="dict.value"
-            :label="dict.label"
+            :label="getDictLabel(dict)"
             :value="dict.value"
           />
         </el-select>
@@ -82,7 +82,7 @@
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
             :key="dict.value"
-            :label="dict.label"
+            :label="getDictLabel(dict)"
             :value="dict.value"
           />
         </el-select>
@@ -117,43 +117,117 @@
 
   <!-- 列表 -->
   <ContentWrap>
+    <!-- 表格工具栏 -->
+    <div class="flex justify-between items-center mb-4">
+      <div class="text-sm text-gray-600">
+        {{ t('common.total') }}: {{ total }} {{ t('common.items') }}
+      </div>
+      <RightToolbar 
+        v-model:showSearch="showSearch"
+        :columns="columns"
+        :search="true"
+        @queryTable="getList"
+      />
+    </div>
+    
     <el-table v-loading="loading" :data="list" stripe>
-<!--      <el-table-column :label="t('wms.customerCode')" prop="customerCode" min-width="120" />-->
-      <el-table-column :label="t('wms.customerName')" prop="customerName" min-width="220" show-overflow-tooltip />
-      <el-table-column :label="t('wms.customerType')" prop="customerType" width="150">
+      <el-table-column 
+        v-if="columns.customerName.visible" 
+        :label="t('wms.customerName')" 
+        prop="customerName" 
+        min-width="220" 
+        show-overflow-tooltip 
+      />
+      <el-table-column 
+        v-if="columns.customerType.visible" 
+        :label="t('wms.customerType')" 
+        prop="customerType" 
+        width="150"
+      >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_CUSTOMER_TYPE" :value="scope.row.customerType" />
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.customerLevel')" prop="customerLevel" width="150">
+      <el-table-column 
+        v-if="columns.customerLevel.visible" 
+        :label="t('wms.customerLevel')" 
+        prop="customerLevel" 
+        width="150"
+      >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_CUSTOMER_LEVEL" :value="scope.row.customerLevel" />
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.contactPerson')" prop="contactPerson" width="100" show-overflow-tooltip />
-      <el-table-column :label="t('wms.contactPhone')" prop="contactPhone" width="150" />
-      <el-table-column :label="t('wms.deliveryAddress')" min-width="200" show-overflow-tooltip>
+      <el-table-column 
+        v-if="columns.contactPerson.visible" 
+        :label="t('wms.contactPerson')" 
+        prop="contactPerson" 
+        width="100" 
+        show-overflow-tooltip 
+      />
+      <el-table-column 
+        v-if="columns.contactPhone.visible" 
+        :label="t('wms.contactPhone')" 
+        prop="contactPhone" 
+        width="130" 
+        show-overflow-tooltip 
+      />
+      <el-table-column 
+        v-if="columns.deliveryAddress.visible" 
+        :label="t('wms.deliveryAddress')" 
+        min-width="200" 
+        show-overflow-tooltip
+      >
         <template #default="scope">
           {{ [scope.row.deliveryProvince, scope.row.deliveryCity, scope.row.deliveryDistrict, scope.row.deliveryAddress].filter(Boolean).join(' ') || '-' }}
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.creditLimit')" prop="creditLimit" width="110" align="right">
+      <el-table-column 
+        v-if="columns.creditLimit.visible" 
+        :label="t('wms.creditLimit')" 
+        prop="creditLimit" 
+        width="110" 
+        align="right"
+      >
         <template #default="scope">
           <span style="color: #409eff; font-weight: 500">{{ formatToFraction(scope.row.creditLimit) }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.totalOrders')" prop="totalOrders" width="90" align="right" />
-      <el-table-column :label="t('wms.totalAmount')" prop="totalAmount" width="180" align="right">
+      <el-table-column 
+        v-if="columns.totalOrders.visible" 
+        :label="t('wms.totalOrders')" 
+        prop="totalOrders" 
+        width="90" 
+        align="right" 
+      />
+      <el-table-column 
+        v-if="columns.totalAmount.visible" 
+        :label="t('wms.totalAmount')" 
+        prop="totalAmount" 
+        width="180" 
+        align="right"
+      >
         <template #default="scope">
           <span style="color: #67c23a; font-weight: 500">{{ formatToFraction(scope.row.totalAmount) }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.status')" prop="status" width="100">
+      <el-table-column 
+        v-if="columns.status.visible" 
+        :label="t('common.status')" 
+        prop="status" 
+        width="80"
+      >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
-      <el-table-column :label="t('common.createTime')" prop="createTime" width="180" :formatter="dateFormatter" />
+      <el-table-column 
+        v-if="columns.createTime.visible" 
+        :label="t('common.createTime')" 
+        prop="createTime" 
+        width="160" 
+        :formatter="dateFormatter" 
+      />
       <el-table-column :label="t('action.action')" fixed="right" width="150">
         <template #default="scope">
           <el-button link type="primary" @click="openForm('update', scope.row.id)" v-hasPermi="['wms:customer:update']">
@@ -181,10 +255,15 @@
 
 <script setup lang="ts">
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { useDictI18n } from '@/hooks/web/useDictI18n'
+
+const { getDictLabel } = useDictI18n() // 字典国际化
 import { dateFormatter } from '@/utils/formatTime'
 import { formatToFraction } from '@/utils'
 import * as CustomerApi from '@/api/wms/customer'
 import CustomerForm from './CustomerForm.vue'
+import RightToolbar from '@/components/RightToolbar/index.vue'
+import { createWMSColumns } from '@/utils/wms-columns-config'
 
 /**
  * 客户管理列表页组件定义
@@ -211,7 +290,13 @@ const queryParams = reactive({
   status: undefined,
   createTime: undefined
 })
-const queryFormRef = ref()
+const queryFormRef = ref() // 搜索表单
+
+// 列设置功能 - RuoYi风格
+const columns = reactive(createWMSColumns(t).customer)
+
+// 显示搜索状态
+const showSearch = ref(true)
 
 /**
  * 查询列表

@@ -15,6 +15,7 @@ const dictStore = useDictStoreWithOut()
 export interface DictDataType {
   dictType: string
   label: string
+  labelEn?: string
   value: string | number | boolean
   colorType: ElementPlusInfoType | ''
   cssClass: string
@@ -105,6 +106,22 @@ export const getDictLabel = (dictType: string, value: any): string => {
     }
   })
   return dictLabel.value
+}
+
+/**
+ * 获取字典的国际化标签
+ * 根据当前语言返回对应的标签文本
+ * 
+ * @param dict 字典数据对象
+ * @param locale 当前语言（'zh-CN' 或 'en'）
+ * @return 字典标签
+ */
+export const getDictI18nLabel = (dict: DictDataType, locale: string): string => {
+  // 如果是英文且有英文标签，返回英文标签；否则返回中文标签
+  if (locale === 'en' && dict.labelEn) {
+    return dict.labelEn
+  }
+  return dict.label
 }
 
 export enum DICT_TYPE {

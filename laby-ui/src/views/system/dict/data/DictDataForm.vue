@@ -17,6 +17,9 @@
       <el-form-item :label="t('system.dict.dataLabel')" prop="label">
         <el-input v-model="formData.label" :placeholder="t('system.dict.dataLabelPlaceholder')" />
       </el-form-item>
+      <el-form-item label="字典标签（英文）" prop="labelEn">
+        <el-input v-model="formData.labelEn" placeholder="请输入字典标签（英文）" />
+      </el-form-item>
       <el-form-item :label="t('system.dict.dataValue')" prop="value">
         <el-input v-model="formData.value" :placeholder="t('system.dict.dataValuePlaceholder')" />
       </el-form-item>
@@ -75,6 +78,7 @@ const formData = ref({
   id: undefined,
   sort: undefined,
   label: '',
+  labelEn: '',
   value: '',
   dictType: '',
   status: CommonStatusEnum.ENABLE,
@@ -171,6 +175,7 @@ const resetForm = () => {
     id: undefined,
     sort: undefined,
     label: '',
+    labelEn: '',
     value: '',
     dictType: '',
     status: CommonStatusEnum.ENABLE,

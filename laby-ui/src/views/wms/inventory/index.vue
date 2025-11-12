@@ -12,7 +12,7 @@
   @date 2025-10-28
 -->
 <template>
-  <ContentWrap>
+  <ContentWrap v-if="showSearch">
     <!-- 搜索工作栏 -->
     <el-form
       class="-mb-15px"
@@ -101,7 +101,7 @@
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.WMS_INVENTORY_STATUS)"
             :key="dict.value"
-            :label="dict.label"
+            :label="getDictLabel(dict)"
             :value="dict.value"
           />
         </el-select>
@@ -125,16 +125,47 @@
 
   <!-- 列表 -->
   <ContentWrap>
+    <!-- 表格工具栏 -->
+    <div class="flex justify-between items-center mb-4">
+      <div class="text-sm text-gray-600">
+        {{ t('common.total') }}: {{ total }} {{ t('common.items') }}
+      </div>
+      <RightToolbar 
+        v-model:showSearch="showSearch"
+        :columns="columns"
+        :search="true"
+        @queryTable="getList"
+      />
+    </div>
+    
     <el-table v-loading="loading" :data="list" stripe>
-      <el-table-column :label="t('wms.warehouse')" align="center" prop="warehouseName" width="120px" />
+      <el-table-column 
+        v-if="columns.warehouseName.visible" 
+        :label="t('wms.warehouse')" 
+        align="center" 
+        prop="warehouseName" 
+        width="120px" 
+      />
       
-      <el-table-column :label="t('wms.area')" align="center" prop="areaName" width="120px">
+      <el-table-column 
+        v-if="columns.areaName.visible" 
+        :label="t('wms.area')" 
+        align="center" 
+        prop="areaName" 
+        width="120px"
+      >
         <template #default="scope">
           {{ scope.row.areaName || '-' }}
         </template>
       </el-table-column>
       
-      <el-table-column :label="t('wms.location')" align="center" prop="locationCode" width="160px">
+      <el-table-column 
+        v-if="columns.locationCode.visible" 
+        :label="t('wms.location')" 
+        align="center" 
+        prop="locationCode" 
+        width="160px"
+      >
         <template #default="scope">
           <div v-if="scope.row.locationId">
             <div class="font-semibold">
@@ -148,7 +179,12 @@
         </template>
       </el-table-column>
       
-      <el-table-column :label="t('wms.goodsInfo')" align="center" min-width="200px">
+      <el-table-column 
+        v-if="columns.goodsName.visible" 
+        :label="t('wms.goodsInfo')" 
+        align="center" 
+        min-width="200px"
+      >
         <template #default="scope">
           <div class="text-left">
             <div class="font-bold">{{ scope.row.goodsName }}</div>
@@ -157,7 +193,12 @@
         </template>
       </el-table-column>
       
-      <el-table-column :label="t('wms.batchSerial')" align="center" width="150px">
+      <el-table-column 
+        v-if="columns.batchNo.visible" 
+        :label="t('wms.batchSerial')" 
+        align="center" 
+        width="150px"
+      >
         <template #default="scope">
           <div v-if="scope.row.batchNo || scope.row.serialNo">
             <div v-if="scope.row.batchNo">{{ t('wms.batchNo') }}: {{ scope.row.batchNo }}</div>
@@ -167,32 +208,56 @@
         </template>
       </el-table-column>
       
-      <el-table-column :label="t('wms.quantity')" align="center" prop="quantity" width="100px">
+      <el-table-column 
+        v-if="columns.quantity.visible" 
+        :label="t('wms.quantity')" 
+        align="center" 
+        prop="quantity" 
+        width="100px"
+      >
         <template #default="scope">
           <el-tag type="primary">{{ scope.row.quantity }}</el-tag>
         </template>
       </el-table-column>
       
-      <el-table-column :label="t('wms.lockQuantity')" align="center" prop="lockQuantity" width="100px">
+      <el-table-column 
+        v-if="columns.lockedQuantity.visible" 
+        :label="t('wms.lockQuantity')" 
+        align="center" 
+        prop="lockQuantity" 
+        width="100px"
+      >
         <template #default="scope">
           <el-tag v-if="scope.row.lockQuantity > 0" type="warning">{{ scope.row.lockQuantity }}</el-tag>
           <span v-else class="text-gray-400">0</span>
         </template>
       </el-table-column>
       
-      <el-table-column :label="t('wms.availableQuantity')" align="center" prop="availableQuantity" width="100px">
+      <el-table-column 
+        v-if="columns.availableQuantity.visible" 
+        :label="t('wms.availableQuantity')" 
+        align="center" 
+        prop="availableQuantity" 
+        width="100px"
+      >
         <template #default="scope">
           <el-tag type="success">{{ scope.row.availableQuantity || (scope.row.quantity - scope.row.lockQuantity) }}</el-tag>
         </template>
       </el-table-column>
       
-      <el-table-column :label="t('common.status')" align="center" width="100px">
+      <el-table-column 
+        v-if="columns.status.visible" 
+        :label="t('common.status')" 
+        align="center" 
+        width="100px"
+      >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_INVENTORY_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
       
       <el-table-column
+        v-if="columns.createTime.visible" 
         :label="t('common.createTime')"
         align="center"
         prop="createTime"
@@ -238,11 +303,16 @@
 
 <script setup lang="ts">
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { useDictI18n } from '@/hooks/web/useDictI18n'
+
+const { getDictLabel } = useDictI18n() // 字典国际化
 import { dateFormatter } from '@/utils/formatTime'
 import * as InventoryApi from '@/api/wms/inventory'
 import * as WarehouseApi from '@/api/wms/warehouse'
 import * as WarehouseLocationApi from '@/api/wms/location'
 import InventoryForm from './InventoryForm.vue'
+import RightToolbar from '@/components/RightToolbar/index.vue'
+import { createWMSColumns } from '@/utils/wms-columns-config'
 
 defineOptions({ name: 'WmsInventory' })
 
@@ -263,6 +333,12 @@ const queryParams = reactive({
   status: undefined
 })
 const queryFormRef = ref()
+
+// 列设置功能 - RuoYi风格
+const columns = reactive(createWMSColumns(t).inventory)
+
+// 显示搜索状态
+const showSearch = ref(true)
 
 // 仓库和库位数据
 const warehouseList = ref([])

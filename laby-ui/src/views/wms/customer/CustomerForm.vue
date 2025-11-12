@@ -31,7 +31,7 @@
               <el-option
                 v-for="dict in getIntDictOptions(DICT_TYPE.WMS_CUSTOMER_TYPE)"
                 :key="dict.value"
-                :label="dict.label"
+                :label="getDictLabel(dict)"
                 :value="dict.value"
               />
             </el-select>
@@ -43,7 +43,7 @@
               <el-option
                 v-for="dict in getIntDictOptions(DICT_TYPE.WMS_CUSTOMER_LEVEL)"
                 :key="dict.value"
-                :label="dict.label"
+                :label="getDictLabel(dict)"
                 :value="dict.value"
               />
             </el-select>
@@ -69,7 +69,7 @@
                 :key="dict.value"
                 :label="dict.value"
               >
-                {{ dict.label }}
+                {{ getDictLabel(dict) }}
               </el-radio>
             </el-radio-group>
           </el-form-item>
@@ -142,6 +142,7 @@
 
 <script setup lang="ts">
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { useDictI18n } from '@/hooks/web/useDictI18n'
 import * as CustomerApi from '@/api/wms/customer'
 import * as AreaApi from '@/api/system/area'
 
@@ -152,6 +153,7 @@ defineOptions({ name: 'CustomerForm' })
 
 const { t } = useI18n()
 const message = useMessage()
+const { getDictLabel } = useDictI18n() // 字典国际化
 
 const dialogVisible = ref(false)
 const dialogTitle = ref('')

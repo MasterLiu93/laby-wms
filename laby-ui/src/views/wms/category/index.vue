@@ -12,7 +12,7 @@
   @date 2025-10-28
 -->
 <template>
-  <ContentWrap>
+  <ContentWrap v-if="showSearch">
     <!-- 搜索工作栏 -->
     <el-form
       class="-mb-15px"
@@ -52,7 +52,7 @@
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
             :key="dict.value"
-            :label="dict.label"
+            :label="getDictLabel(dict)"
             :value="dict.value"
           />
         </el-select>
@@ -78,6 +78,13 @@
 
   <!-- 列表（树形表格） -->
   <ContentWrap>
+    <!-- 表格工具栏 -->
+    <div class="flex justify-between items-center mb-4">
+      <div class="text-sm text-gray-600">
+        {{ t('common.total') }}: {{ list.length }} {{ t('common.items') }}
+      </div>
+      <RightToolbar v-model:showSearch="showSearch" :search="true" @queryTable="getList" />
+    </div>
     <el-table
       v-loading="loading"
       :data="list"
@@ -146,9 +153,13 @@
 
 <script setup lang="ts">
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { useDictI18n } from '@/hooks/web/useDictI18n'
 import { dateFormatter } from '@/utils/formatTime'
 import * as GoodsCategoryApi from '@/api/wms/category'
 import CategoryForm from './CategoryForm.vue'
+import RightToolbar from '@/components/RightToolbar/index.vue'
+
+const { getDictLabel } = useDictI18n() // 字典国际化
 
 defineOptions({ name: 'WmsGoodsCategory' })
 
@@ -158,6 +169,7 @@ const { t } = useI18n()
 const loading = ref(true) // 列表加载中
 const list = ref<any[]>([]) // 树形列表数据
 const expandAll = ref(false) // 是否展开所有节点
+const showSearch = ref(true) // 显示搜索
 
 // 查询参数
 const queryParams = reactive({

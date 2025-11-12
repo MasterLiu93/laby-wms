@@ -64,22 +64,30 @@
 
   <!-- 列表 -->
   <ContentWrap>
+    <!-- 表格工具栏 -->
+    <div class="flex justify-between items-center mb-4">
+      <div class="text-sm text-gray-600">
+        {{ t('common.total') }}: {{ totalCount }} {{ t('common.items') }}
+      </div>
+      <RightToolbar v-model:showSearch="showSearch" :columns="columns" :search="true" @queryTable="getList" />
+    </div>
+    
     <el-table v-loading="loading" :data="list" stripe>
-      <el-table-column :label="t('wms.warningType')" prop="warningType" width="120">
+      <el-table-column v-if="columns.warningType.visible" :label="t('wms.warningType')" prop="warningType" width="120">
         <template #default="scope">
           <el-tag v-if="scope.row.warningType === 'LOW_STOCK'" type="warning">{{ t('wms.lowStock') }}</el-tag>
           <el-tag v-else-if="scope.row.warningType === 'EXPIRING'" type="danger">{{ t('wms.expiringSoon') }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.warehouse')" prop="warehouseName" width="120" />
-      <el-table-column :label="t('wms.goodsInfo')" min-width="200">
+      <el-table-column v-if="columns.warehouseName.visible" :label="t('wms.warehouse')" prop="warehouseName" width="120" />
+      <el-table-column v-if="columns.goodsInfo.visible" :label="t('wms.goodsInfo')" min-width="200">
         <template #default="scope">
           <div>{{ scope.row.skuCode }}</div>
           <div class="text-gray-500 text-xs">{{ scope.row.goodsName }}</div>
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.batchNo')" prop="batchNo" width="140" />
-      <el-table-column :label="t('wms.currentQuantity')" width="120" align="right">
+      <el-table-column v-if="columns.batchNo.visible" :label="t('wms.batchNo')" prop="batchNo" width="140" />
+      <el-table-column v-if="columns.currentQuantity.visible" :label="t('wms.currentQuantity')" width="120" align="right">
         <template #default="scope">
           <div>{{ t('wms.totalQuantity') }}：{{ scope.row.quantity }}</div>
           <div class="text-gray-500 text-xs" v-if="scope.row.lockQuantity > 0">
@@ -87,20 +95,20 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.availableQuantity')" prop="availableQuantity" width="100" align="right">
+      <el-table-column v-if="columns.availableQuantity.visible" :label="t('wms.availableQuantity')" prop="availableQuantity" width="100" align="right">
         <template #default="scope">
           <span :class="scope.row.availableQuantity < (scope.row.safetyStock || 0) ? 'text-red-500 font-bold' : 'text-green-600'">
             {{ scope.row.availableQuantity }}
           </span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.safetyStock')" prop="safetyStock" width="100" align="right">
+      <el-table-column v-if="columns.safetyStock.visible" :label="t('wms.safetyStock')" prop="safetyStock" width="100" align="right">
         <template #default="scope">
           <span v-if="scope.row.safetyStock" class="text-blue-500">{{ scope.row.safetyStock }}</span>
           <span v-else class="text-gray-400">-</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.expireInfo')" width="150">
+      <el-table-column v-if="columns.expireInfo.visible" :label="t('wms.expireInfo')" width="150">
         <template #default="scope">
           <div v-if="scope.row.expireDate">
             <div class="text-xs">{{ scope.row.expireDate }}</div>
@@ -111,7 +119,7 @@
           <span v-else class="text-gray-400">-</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.warningDesc')" min-width="200">
+      <el-table-column v-if="columns.warningDesc.visible" :label="t('wms.warningDesc')" min-width="200">
         <template #default="scope">
           <div v-if="scope.row.warningType === 'LOW_STOCK'" class="text-orange-600">
             {{ t('wms.lowStockDesc').replace('{available}', scope.row.availableQuantity).replace('{safety}', scope.row.safetyStock) }}
@@ -127,6 +135,8 @@
 
 <script setup lang="ts">
 import * as InventoryWarningApi from '@/api/wms/inventory-warning'
+import RightToolbar from '@/components/RightToolbar/index.vue'
+import { createWMSColumns } from '@/utils/wms-columns-config'
 
 defineOptions({ name: 'WmsInventoryWarning' })
 
@@ -136,6 +146,10 @@ const { t } = useI18n()
 const loading = ref(true)
 const list = ref([])
 const activeTab = ref('all')
+
+// 列设置功能
+const columns = reactive(createWMSColumns(t).inventoryWarning)
+const showSearch = ref(true)
 
 // 统计数据
 const lowStockCount = ref(0)
@@ -181,7 +195,6 @@ const handleTabChange = () => {
  */
 const handleRefresh = () => {
   getList()
-  message.success(t('wms.refreshSuccess'))
 }
 
 /**

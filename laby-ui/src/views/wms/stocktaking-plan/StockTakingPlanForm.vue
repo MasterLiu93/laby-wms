@@ -35,11 +35,11 @@
       <el-row :gutter="20">
         <el-col :span="12">
           <el-form-item :label="t('wms.takingType')" prop="takingType">
-            <el-select v-model="formData.takingType" :placeholder="t('wms.takingTypePlaceholder')" class="!w-full">
+            <el-select v-model="formData.stockTakingType" :placeholder="t('wms.stockTakingTypePlaceholder')" class="!w-full">
               <el-option
                 v-for="dict in getIntDictOptions(DICT_TYPE.WMS_STOCK_TAKING_TYPE)"
                 :key="dict.value"
-                :label="dict.label"
+                :label="getDictLabel(dict)"
                 :value="dict.value"
               />
             </el-select>
@@ -51,7 +51,7 @@
               <el-option
                 v-for="dict in getIntDictOptions(DICT_TYPE.WMS_STOCK_TAKING_SCOPE_TYPE)"
                 :key="dict.value"
-                :label="dict.label"
+                :label="getDictLabel(dict)"
                 :value="dict.value"
               />
             </el-select>
@@ -98,9 +98,12 @@
 
 <script setup lang="ts">
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { useDictI18n } from '@/hooks/web/useDictI18n'
 import { formatDate } from '@/utils/formatTime'
 import * as StockTakingPlanApi from '@/api/wms/stockTakingPlan'
 import * as WarehouseApi from '@/api/wms/warehouse'
+
+const { getDictLabel } = useDictI18n() // 字典国际化
 
 defineOptions({ name: 'StockTakingPlanForm' })
 

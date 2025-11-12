@@ -4,6 +4,7 @@ import { isHexColor } from '@/utils/color'
 import { ElTag } from 'element-plus'
 import { DictDataType, getDictOptions } from '@/utils/dict'
 import { isArray, isBoolean, isNumber, isString } from '@/utils/is'
+import { useLocaleStore } from '@/store/modules/locale'
 
 export default defineComponent({
   name: 'DictTag',
@@ -28,6 +29,8 @@ export default defineComponent({
     }
   },
   setup(props) {
+    const localeStore = useLocaleStore()
+    const isEnglish = computed(() => localeStore.getCurrentLocale.lang === 'en')
     const valueArr: any = computed(() => {
       // 1. 是 Number 类型和 Boolean 类型的情况
       if (isNumber(props.value) || isBoolean(props.value)) {
@@ -68,6 +71,8 @@ export default defineComponent({
               if (dict.colorType + '' === 'primary' || dict.colorType + '' === 'default') {
                 dict.colorType = ''
               }
+              // 根据当前语言选择显示中文或英文标签
+              const displayLabel = isEnglish.value && dict?.labelEn ? dict.labelEn : dict?.label
               return (
                 // 添加标签的文字颜色为白色，解决自定义背景颜色时标签文字看不清的问题
                 <ElTag
@@ -76,7 +81,7 @@ export default defineComponent({
                   color={dict?.cssClass && isHexColor(dict?.cssClass) ? dict?.cssClass : ''}
                   disableTransitions={true}
                 >
-                  {dict?.label}
+                  {displayLabel}
                 </ElTag>
               )
             }

@@ -31,7 +31,7 @@
               <el-option
                 v-for="dict in getIntDictOptions(DICT_TYPE.WMS_SUPPLIER_TYPE)"
                 :key="dict.value"
-                :label="dict.label"
+                :label="getDictLabel(dict)"
                 :value="dict.value"
               />
             </el-select>
@@ -43,7 +43,7 @@
               <el-option
                 v-for="dict in getIntDictOptions(DICT_TYPE.WMS_SUPPLIER_CREDIT_LEVEL)"
                 :key="dict.value"
-                :label="dict.label"
+                :label="getDictLabel(dict)"
                 :value="dict.value"
               />
             </el-select>
@@ -68,7 +68,7 @@
                 :key="dict.value"
                 :label="dict.value"
               >
-                {{ dict.label }}
+                {{ getDictLabel(dict) }}
               </el-radio>
             </el-radio-group>
           </el-form-item>
@@ -141,6 +141,7 @@
 
 <script setup lang="ts">
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { useDictI18n } from '@/hooks/web/useDictI18n'
 import * as SupplierApi from '@/api/wms/supplier'
 import * as AreaApi from '@/api/system/area'
 
@@ -150,6 +151,7 @@ import * as AreaApi from '@/api/system/area'
 defineOptions({ name: 'SupplierForm' })
 
 const { t } = useI18n()
+const { getDictLabel } = useDictI18n() // 字典国际化
 const message = useMessage()
 
 const dialogVisible = ref(false)

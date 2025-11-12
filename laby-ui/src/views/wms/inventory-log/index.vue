@@ -11,7 +11,7 @@
   @date 2025-10-28
 -->
 <template>
-  <ContentWrap>
+  <ContentWrap v-if="showSearch">
     <!-- 搜索工作栏 -->
     <el-form class="-mb-15px" :model="queryParams" ref="queryFormRef" :inline="true">
       <el-form-item :label="t('wms.warehouse')" prop="warehouseId">
@@ -67,17 +67,25 @@
 
   <!-- 列表 -->
   <ContentWrap>
+    <!-- 表格工具栏 -->
+    <div class="flex justify-between items-center mb-4">
+      <div class="text-sm text-gray-600">
+        {{ t('common.total') }}: {{ total }} {{ t('common.items') }}
+      </div>
+      <RightToolbar v-model:showSearch="showSearch" :columns="columns" :search="true" @queryTable="getList" />
+    </div>
+    
     <el-table v-loading="loading" :data="list" stripe>
-      <el-table-column :label="t('wms.warehouse')" prop="warehouseName" width="120" />
-      <el-table-column :label="t('wms.goodsInfo')" min-width="200">
+      <el-table-column v-if="columns.warehouseName.visible" :label="t('wms.warehouse')" prop="warehouseName" width="120" />
+      <el-table-column v-if="columns.goodsName.visible" :label="t('wms.goodsInfo')" min-width="200">
         <template #default="scope">
           <div>{{ scope.row.skuCode }}</div>
           <div class="text-gray-500 text-xs">{{ scope.row.goodsName }}</div>
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.location')" prop="locationCode" width="120" />
-      <el-table-column :label="t('wms.batchNo')" prop="batchNo" width="140" />
-      <el-table-column :label="t('wms.operationType')" prop="operationType" width="100">
+      <el-table-column v-if="columns.locationCode.visible" :label="t('wms.location')" prop="locationCode" width="120" />
+      <el-table-column v-if="columns.batchNo.visible" :label="t('wms.batchNo')" prop="batchNo" width="140" />
+      <el-table-column v-if="columns.operationType.visible" :label="t('wms.operationType')" prop="operationType" width="100">
         <template #default="scope">
           <el-tag v-if="scope.row.operationType === 'INBOUND'" type="success">{{ t('wms.inbound') }}</el-tag>
           <el-tag v-else-if="scope.row.operationType === 'OUTBOUND'" type="danger">{{ t('wms.outbound') }}</el-tag>
@@ -87,20 +95,20 @@
           <el-tag v-else>{{ scope.row.operationType }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.changeQuantity')" prop="quantityChange" width="100" align="right">
+      <el-table-column v-if="columns.changeQuantity.visible" :label="t('wms.changeQuantity')" prop="quantityChange" width="100" align="right">
         <template #default="scope">
           <span :class="scope.row.quantityChange > 0 ? 'text-green-500' : 'text-red-500'">
             {{ scope.row.quantityChange > 0 ? '+' : '' }}{{ scope.row.quantityChange }}
           </span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.beforeQuantity')" prop="quantityBefore" width="100" align="right" />
-      <el-table-column :label="t('wms.afterQuantity')" prop="quantityAfter" width="100" align="right" />
-      <el-table-column :label="t('wms.businessType')" prop="businessType" width="100" />
-      <el-table-column :label="t('wms.businessNo')" prop="businessNo" width="150" show-overflow-tooltip />
-      <el-table-column :label="t('wms.operator')" prop="operator" width="100" />
-      <el-table-column :label="t('wms.operateTime')" prop="createTime" width="160" :formatter="dateFormatter" />
-      <el-table-column :label="t('form.remark')" prop="remark" min-width="150" show-overflow-tooltip />
+      <el-table-column v-if="columns.beforeQuantity.visible" :label="t('wms.beforeQuantity')" prop="quantityBefore" width="100" align="right" />
+      <el-table-column v-if="columns.afterQuantity.visible" :label="t('wms.afterQuantity')" prop="quantityAfter" width="100" align="right" />
+      <el-table-column v-if="columns.businessType.visible" :label="t('wms.businessType')" prop="businessType" width="100" />
+      <el-table-column v-if="columns.businessNo.visible" :label="t('wms.businessNo')" prop="businessNo" width="150" show-overflow-tooltip />
+      <el-table-column v-if="columns.operator.visible" :label="t('wms.operator')" prop="operator" width="100" />
+      <el-table-column v-if="columns.createTime.visible" :label="t('wms.operateTime')" prop="createTime" width="160" :formatter="dateFormatter" />
+      <el-table-column v-if="columns.remark.visible" :label="t('form.remark')" prop="remark" min-width="150" show-overflow-tooltip />
     </el-table>
     
     <!-- 分页 -->
@@ -118,6 +126,8 @@ import * as InventoryLogApi from '@/api/wms/inventory-log'
 import * as WarehouseApi from '@/api/wms/warehouse'
 import * as GoodsApi from '@/api/wms/goods'
 import { dateFormatter } from '@/utils/formatTime'
+import RightToolbar from '@/components/RightToolbar/index.vue'
+import { createWMSColumns } from '@/utils/wms-columns-config'
 
 defineOptions({ name: 'WmsInventoryLog' })
 
@@ -129,6 +139,10 @@ const list = ref([])
 const total = ref(0)
 const warehouseList = ref([])
 const goodsList = ref([])
+
+// 列设置功能
+const columns = reactive(createWMSColumns(t).inventoryLog)
+const showSearch = ref(true)
 
 // 查询参数
 const queryParams = reactive({

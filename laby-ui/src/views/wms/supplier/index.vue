@@ -11,7 +11,7 @@
   @date 2025-10-28
 -->
 <template>
-  <ContentWrap>
+  <ContentWrap v-if="showSearch">
     <!-- 搜索工作栏 -->
     <el-form class="-mb-15px" :model="queryParams" ref="queryFormRef" :inline="true">
       <el-form-item :label="t('wms.supplierCode')" prop="supplierCode">
@@ -40,7 +40,7 @@
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.WMS_SUPPLIER_TYPE)"
             :key="dict.value"
-            :label="dict.label"
+            :label="getDictLabel(dict)"
             :value="dict.value"
           />
         </el-select>
@@ -55,7 +55,7 @@
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.WMS_SUPPLIER_CREDIT_LEVEL)"
             :key="dict.value"
-            :label="dict.label"
+            :label="getDictLabel(dict)"
             :value="dict.value"
           />
         </el-select>
@@ -81,7 +81,7 @@
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
             :key="dict.value"
-            :label="dict.label"
+            :label="getDictLabel(dict)"
             :value="dict.value"
           />
         </el-select>
@@ -116,38 +116,112 @@
 
   <!-- 列表 -->
   <ContentWrap>
+    <!-- 表格工具栏 -->
+    <div class="flex justify-between items-center mb-4">
+      <div class="text-sm text-gray-600">
+        {{ t('common.total') }}: {{ total }} {{ t('common.items') }}
+      </div>
+      <RightToolbar 
+        v-model:showSearch="showSearch"
+        :columns="columns"
+        :search="true"
+        @queryTable="getList"
+      />
+    </div>
+    
     <el-table v-loading="loading" :data="list" stripe>
-      <el-table-column :label="t('wms.supplierCode')" prop="supplierCode" min-width="120" />
-      <el-table-column :label="t('wms.supplierName')" prop="supplierName" min-width="180" show-overflow-tooltip />
-      <el-table-column :label="t('wms.supplierType')" prop="supplierType" width="120">
+      <el-table-column 
+        v-if="columns.supplierCode.visible" 
+        :label="t('wms.supplierCode')" 
+        align="center" 
+        prop="supplierCode" 
+        width="150px" 
+      />
+      <el-table-column 
+        v-if="columns.supplierName.visible" 
+        :label="t('wms.supplierName')" 
+        align="center" 
+        prop="supplierName" 
+        min-width="200px" 
+      />
+      <el-table-column 
+        v-if="columns.supplierType.visible" 
+        :label="t('wms.supplierType')" 
+        align="center" 
+        width="120px"
+      >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_SUPPLIER_TYPE" :value="scope.row.supplierType" />
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.contactPerson')" prop="contactPerson" width="100" show-overflow-tooltip />
-      <el-table-column :label="t('wms.contactPhone')" prop="contactPhone" width="120" />
-      <el-table-column :label="t('wms.provinceCityDistrict')" min-width="150" show-overflow-tooltip>
+      <el-table-column 
+        v-if="columns.contactPerson.visible" 
+        :label="t('wms.contactPerson')" 
+        align="center" 
+        width="100px"
+      />
+      <el-table-column 
+        v-if="columns.contactPhone.visible" 
+        :label="t('wms.contactPhone')" 
+        prop="contactPhone" 
+        width="120" 
+      />
+      <el-table-column 
+        v-if="columns.provinceCityDistrict.visible" 
+        :label="t('wms.provinceCityDistrict')" 
+        min-width="150" 
+        show-overflow-tooltip
+      >
         <template #default="scope">
           {{ [scope.row.province, scope.row.city, scope.row.district].filter(Boolean).join(' ') || '-' }}
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.address')" prop="address" min-width="180" show-overflow-tooltip />
-      <el-table-column :label="t('wms.creditLevel')" prop="creditLevel" width="100">
+      <el-table-column 
+        v-if="columns.address.visible" 
+        :label="t('wms.address')" 
+        prop="address" 
+        min-width="180" 
+        show-overflow-tooltip 
+      />
+      <el-table-column 
+        v-if="columns.creditLevel.visible" 
+        :label="t('wms.creditLevel')" 
+        align="center" 
+        width="100px"
+      >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_SUPPLIER_CREDIT_LEVEL" :value="scope.row.creditLevel" />
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.cooperationStartDate')" prop="cooperationStartDate" width="120">
+      <el-table-column 
+        v-if="columns.cooperationStartDate.visible" 
+        :label="t('wms.cooperationStartDate')" 
+        prop="cooperationStartDate" 
+        width="120px"
+      >
         <template #default="scope">
           {{ formatCooperationDate(scope.row.cooperationStartDate) }}
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.status')" prop="status" width="80">
+      <el-table-column 
+        v-if="columns.status.visible" 
+        :label="t('common.status')" 
+        align="center" 
+        prop="status" 
+        width="80px"
+      >
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
-      <el-table-column :label="t('common.createTime')" prop="createTime" width="180" :formatter="dateFormatter" />
+      <el-table-column 
+        v-if="columns.createTime.visible" 
+        :label="t('common.createTime')" 
+        align="center" 
+        prop="createTime" 
+        width="180px" 
+        :formatter="dateFormatter" 
+      />
       <el-table-column :label="t('action.action')" fixed="right" width="150">
         <template #default="scope">
           <el-button link type="primary" @click="openForm('update', scope.row.id)" v-hasPermi="['wms:supplier:update']">
@@ -175,9 +249,14 @@
 
 <script setup lang="ts">
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { useDictI18n } from '@/hooks/web/useDictI18n'
+
+const { getDictLabel } = useDictI18n() // 字典国际化
 import { formatDate } from '@/utils/formatTime'
 import * as SupplierApi from '@/api/wms/supplier'
 import SupplierForm from './SupplierForm.vue'
+import RightToolbar from '@/components/RightToolbar/index.vue'
+import { createWMSColumns } from '@/utils/wms-columns-config'
 
 /**
  * 供应商管理列表页组件定义
@@ -205,6 +284,12 @@ const queryParams = reactive({
   createTime: undefined
 })
 const queryFormRef = ref()
+
+// 列设置功能 - RuoYi风格
+const columns = reactive(createWMSColumns(t).supplier)
+
+// 显示搜索状态
+const showSearch = ref(true)
 
 /**
  * 查询列表

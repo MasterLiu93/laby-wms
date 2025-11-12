@@ -10,7 +10,7 @@
   @date 2025-10-28
 -->
 <template>
-  <ContentWrap>
+  <ContentWrap v-if="showSearch">
     <!-- 搜索工作栏 -->
     <el-form class="-mb-15px" :model="queryParams" ref="queryFormRef" :inline="true">
       <el-form-item :label="t('wms.moveNo')" prop="moveNo">
@@ -38,7 +38,7 @@
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.WMS_STOCK_MOVE_TYPE)"
             :key="dict.value"
-            :label="dict.label"
+            :label="getDictLabel(dict)"
             :value="dict.value"
           />
         </el-select>
@@ -58,7 +58,7 @@
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.WMS_STOCK_MOVE_STATUS)"
             :key="dict.value"
-            :label="dict.label"
+            :label="getDictLabel(dict)"
             :value="dict.value"
           />
         </el-select>
@@ -76,27 +76,36 @@
 
   <!-- 列表 -->
   <ContentWrap>
+    <!-- 表格工具栏 -->
+    <div class="flex justify-between items-center mb-4">
+      <div class="text-sm text-gray-600">
+        {{ t('common.total') }}: {{ total }} {{ t('common.items') }}
+      </div>
+      <RightToolbar v-model:showSearch="showSearch" :columns="columns" :search="true" @queryTable="getList" />
+    </div>
+    
     <el-table v-loading="loading" :data="list">
-      <el-table-column :label="t('wms.moveNo')" prop="moveNo" width="160" align="center" />
-      <el-table-column :label="t('wms.warehouse')" prop="warehouseName" width="120" align="center" />
-      <el-table-column :label="t('wms.moveType')" prop="moveType" width="100" align="center">
+      <el-table-column v-if="columns.moveNo.visible" :label="t('wms.moveNo')" prop="moveNo" width="160" align="center" />
+      <el-table-column v-if="columns.warehouseName.visible" :label="t('wms.warehouse')" prop="warehouseName" width="120" align="center" />
+      <el-table-column v-if="columns.moveType.visible" :label="t('wms.moveType')" prop="moveType" width="100" align="center">
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_STOCK_MOVE_TYPE" :value="scope.row.moveType" />
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.goodsName')" prop="goodsName" min-width="180" show-overflow-tooltip />
-      <el-table-column :label="t('wms.skuCode')" prop="skuCode" width="140" align="center" />
-      <el-table-column :label="t('wms.batchNo')" prop="batchNo" width="120" align="center" />
-      <el-table-column :label="t('wms.fromLocationCode')" prop="fromLocationCode" width="120" align="center" />
-      <el-table-column :label="t('wms.toLocationCode')" prop="toLocationCode" width="120" align="center" />
-      <el-table-column :label="t('wms.quantity')" prop="quantity" width="100" align="center" />
-      <el-table-column :label="t('wms.moveReason')" prop="moveReason" width="150" show-overflow-tooltip />
-      <el-table-column :label="t('wms.status')" prop="status" width="100" align="center" show-overflow-tooltip>
+      <el-table-column v-if="columns.goodsName.visible" :label="t('wms.goodsName')" prop="goodsName" min-width="180" show-overflow-tooltip />
+      <el-table-column v-if="columns.skuCode.visible" :label="t('wms.skuCode')" prop="skuCode" width="140" align="center" />
+      <el-table-column v-if="columns.batchNo.visible" :label="t('wms.batchNo')" prop="batchNo" width="120" align="center" />
+      <el-table-column v-if="columns.fromLocationCode.visible" :label="t('wms.fromLocationCode')" prop="fromLocationCode" width="120" align="center" />
+      <el-table-column v-if="columns.toLocationCode.visible" :label="t('wms.toLocationCode')" prop="toLocationCode" width="120" align="center" />
+      <el-table-column v-if="columns.quantity.visible" :label="t('wms.quantity')" prop="quantity" width="100" align="center" />
+      <el-table-column v-if="columns.moveReason.visible" :label="t('wms.moveReason')" prop="moveReason" width="150" show-overflow-tooltip />
+      <el-table-column v-if="columns.status.visible" :label="t('wms.status')" prop="status" width="100" align="center" show-overflow-tooltip>
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_STOCK_MOVE_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
       <el-table-column
+        v-if="columns.createTime.visible"
         :label="t('common.createTime')"
         prop="createTime"
         width="160"
@@ -169,10 +178,15 @@
 
 <script setup lang="ts">
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { useDictI18n } from '@/hooks/web/useDictI18n'
+
+const { getDictLabel } = useDictI18n() // 字典国际化
 import { formatDate } from '@/utils/formatTime'
 import * as StockMoveApi from '@/api/wms/stockMove'
 import * as WarehouseApi from '@/api/wms/warehouse'
 import StockMoveForm from './StockMoveForm.vue'
+import RightToolbar from '@/components/RightToolbar/index.vue'
+import { createWMSColumns } from '@/utils/wms-columns-config'
 
 /**
  * 移库管理列表页组件定义
@@ -186,6 +200,10 @@ const loading = ref(true) // 列表加载中
 const list = ref([]) // 列表数据
 const total = ref(0) // 总条数
 const warehouseList = ref([]) // 仓库列表
+
+// 列设置功能
+const columns = reactive(createWMSColumns(t).stockMove)
+const showSearch = ref(true)
 
 // 查询参数
 const queryParams = reactive({

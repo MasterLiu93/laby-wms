@@ -1,5 +1,5 @@
 <template>
-  <ContentWrap>
+  <ContentWrap v-if="showSearch">
     <!-- 搜索区域 -->
     <el-form
       ref="queryFormRef"
@@ -42,7 +42,7 @@
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.WMS_WAVE_TYPE)"
             :key="dict.value"
-            :label="dict.label"
+            :label="getDictLabel(dict)"
             :value="dict.value"
           />
         </el-select>
@@ -57,7 +57,7 @@
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.WMS_WAVE_STATUS)"
             :key="dict.value"
-            :label="dict.label"
+            :label="getDictLabel(dict)"
             :value="dict.value"
           />
         </el-select>
@@ -92,17 +92,27 @@
         </el-button>
       </el-form-item>
     </el-form>
-
-    <!-- 列表区域 -->
-    <el-table v-loading="loading" :data="list" border stripe>
-      <el-table-column :label="t('wms.waveNo')" prop="waveNo" min-width="180" show-overflow-tooltip fixed />
-      <el-table-column :label="t('wms.warehouse')" prop="warehouseName" min-width="120" show-overflow-tooltip />
-      <el-table-column :label="t('wms.waveType')" prop="waveType" min-width="100" align="center">
+  </ContentWrap>
+  
+  <!-- 列表区域 -->
+  <ContentWrap>
+    <!-- 表格工具栏 -->
+    <div class="flex justify-between items-center mb-4">
+      <div class="text-sm text-gray-600">
+        {{ t('common.total') }}: {{ total }} {{ t('common.items') }}
+      </div>
+      <RightToolbar v-model:showSearch="showSearch" :columns="columns" :search="true" @queryTable="getList" />
+    </div>
+    
+    <el-table v-loading="loading" :data="list" stripe>
+      <el-table-column v-if="columns.waveNo.visible" :label="t('wms.waveNo')" prop="waveNo" min-width="180" show-overflow-tooltip fixed />
+      <el-table-column v-if="columns.warehouseName.visible" :label="t('wms.warehouse')" prop="warehouseName" min-width="120" show-overflow-tooltip />
+      <el-table-column v-if="columns.waveType.visible" :label="t('wms.waveType')" prop="waveType" min-width="100" align="center">
         <template #default="{ row }">
           <dict-tag :type="DICT_TYPE.WMS_WAVE_TYPE" :value="row.waveType" />
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.relatedOutbounds')" prop="outboundNos" min-width="200" show-overflow-tooltip>
+      <el-table-column v-if="columns.outboundNos.visible" :label="t('wms.relatedOutbounds')" prop="outboundNos" min-width="200" show-overflow-tooltip>
         <template #default="{ row }">
           <span v-if="row.outboundNos && row.outboundNos.length > 0">
             {{ row.outboundNos.join(', ') }}
@@ -110,35 +120,37 @@
           <span v-else style="color: #999">-</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.orderCount')" prop="orderCount" min-width="90" align="center" />
-      <el-table-column :label="t('wms.totalQuantity')" prop="totalQuantity" min-width="90" align="center" />
-      <el-table-column :label="t('wms.priority')" prop="priority" min-width="80" align="center">
+      <el-table-column v-if="columns.orderCount.visible" :label="t('wms.orderCount')" prop="orderCount" min-width="90" align="center" />
+      <el-table-column v-if="columns.totalQuantity.visible" :label="t('wms.totalQuantity')" prop="totalQuantity" min-width="90" align="center" />
+      <el-table-column v-if="columns.priority.visible" :label="t('wms.priority')" prop="priority" min-width="80" align="center">
         <template #default="{ row }">
           <el-tag v-if="row.priority === 3" type="danger">{{ t('wms.urgent') }}</el-tag>
           <el-tag v-else-if="row.priority === 2" type="warning">{{ t('wms.important') }}</el-tag>
           <el-tag v-else type="info">{{ t('wms.normal') }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.picker')" prop="pickerName" min-width="100" show-overflow-tooltip>
+      <el-table-column v-if="columns.pickerName.visible" :label="t('wms.picker')" prop="pickerName" min-width="100" show-overflow-tooltip>
         <template #default="{ row }">
           <span v-if="row.pickerName">{{ row.pickerName }}</span>
           <el-tag v-else type="info">{{ t('wms.unassigned') }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.waveStatus')" prop="status" min-width="100" align="center">
+      <el-table-column v-if="columns.status.visible" :label="t('wms.waveStatus')" prop="status" min-width="100" align="center">
         <template #default="{ row }">
           <dict-tag :type="DICT_TYPE.WMS_WAVE_STATUS" :value="row.status" />
         </template>
       </el-table-column>
       <el-table-column
+        v-if="columns.startTime.visible"
         :label="t('wms.startTime')"
         prop="startTime"
         min-width="160"
         :formatter="dateFormatter"
       />
-      <el-table-column :label="t('wms.endTime')" prop="endTime" min-width="160" :formatter="dateFormatter" />
-      <el-table-column :label="t('form.remark')" prop="remark" min-width="150" show-overflow-tooltip />
+      <el-table-column v-if="columns.endTime.visible" :label="t('wms.endTime')" prop="endTime" min-width="160" :formatter="dateFormatter" />
+      <el-table-column v-if="columns.remark.visible" :label="t('form.remark')" prop="remark" min-width="150" show-overflow-tooltip />
       <el-table-column
+        v-if="columns.createTime.visible"
         :label="t('common.createTime')"
         prop="createTime"
         min-width="160"
@@ -263,7 +275,7 @@
             <el-option
               v-for="dict in getIntDictOptions(DICT_TYPE.WMS_WAVE_TYPE)"
               :key="dict.value"
-              :label="dict.label"
+              :label="getDictLabel(dict)"
               :value="dict.value"
             />
           </el-select>
@@ -295,6 +307,9 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { useDictI18n } from '@/hooks/web/useDictI18n'
+
+const { getDictLabel } = useDictI18n() // 字典国际化
 import { dateFormatter } from '@/utils/formatTime'
 import { generatePickingTasks, generatePickingWaves } from '@/api/wms/pickingWave'
 import * as PickingWaveApi from '@/api/wms/pickingWave'
@@ -302,6 +317,8 @@ import * as WarehouseApi from '@/api/wms/warehouse'
 import * as UserApi from '@/api/system/user'
 import PickingWaveForm from './PickingWaveForm.vue'
 import PickingWaveDetail from './PickingWaveDetail.vue'
+import RightToolbar from '@/components/RightToolbar/index.vue'
+import { createWMSColumns } from '@/utils/wms-columns-config'
 
 const { t } = useI18n()
 const message = useMessage()
@@ -311,6 +328,10 @@ const loading = ref(true)
 const list = ref([])
 const total = ref(0)
 const queryFormRef = ref()
+
+// 列设置功能
+const columns = reactive(createWMSColumns(t).pickingWave)
+const showSearch = ref(true)
 const queryParams = reactive({
   pageNo: 1,
   pageSize: 10,

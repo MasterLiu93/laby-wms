@@ -97,22 +97,30 @@
 
   <!-- 列表 -->
   <ContentWrap>
-    <el-table v-loading="loading" :data="list">
-      <el-table-column :label="t('wms.warehouse')" prop="warehouseName" width="120" align="center" />
-      <el-table-column :label="t('wms.location')" prop="locationCode" width="120" align="center" />
-      <el-table-column :label="t('wms.skuCode')" prop="skuCode" width="140" align="center" />
-      <el-table-column :label="t('wms.goodsName')" prop="goodsName" min-width="180" show-overflow-tooltip />
-      <el-table-column :label="t('wms.category')" prop="categoryName" width="120" align="center" />
-      <el-table-column :label="t('wms.batchNo')" prop="batchNo" width="120" align="center" />
-      <el-table-column :label="t('wms.totalQuantityLabel')" prop="totalQuantity" width="100" align="center" />
-      <el-table-column :label="t('wms.availableQuantityLabel')" prop="availableQuantity" width="100" align="center">
+    <!-- 表格工具栏 -->
+    <div class="flex justify-between items-center mb-4">
+      <div class="text-sm text-gray-600">
+        {{ t('common.total') }}: {{ total }} {{ t('common.items') }}
+      </div>
+      <RightToolbar v-model:showSearch="showSearch" :columns="columns" :search="true" @queryTable="getList" />
+    </div>
+    
+    <el-table v-loading="loading" :data="list" stripe>
+      <el-table-column v-if="columns.warehouseName.visible" :label="t('wms.warehouse')" prop="warehouseName" width="120" align="center" />
+      <el-table-column v-if="columns.locationCode.visible" :label="t('wms.location')" prop="locationCode" width="120" align="center" />
+      <el-table-column v-if="columns.skuCode.visible" :label="t('wms.skuCode')" prop="skuCode" width="140" align="center" />
+      <el-table-column v-if="columns.goodsName.visible" :label="t('wms.goodsName')" prop="goodsName" min-width="180" show-overflow-tooltip />
+      <el-table-column v-if="columns.categoryName.visible" :label="t('wms.category')" prop="categoryName" width="120" align="center" />
+      <el-table-column v-if="columns.batchNo.visible" :label="t('wms.batchNo')" prop="batchNo" width="120" align="center" />
+      <el-table-column v-if="columns.totalQuantity.visible" :label="t('wms.totalQuantityLabel')" prop="totalQuantity" width="100" align="center" />
+      <el-table-column v-if="columns.availableQuantity.visible" :label="t('wms.availableQuantityLabel')" prop="availableQuantity" width="100" align="center">
         <template #default="scope">
           <span :class="{ 'text-danger': scope.row.isLowStock }">{{ scope.row.availableQuantity }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('wms.lockedQuantityLabel')" prop="lockedQuantity" width="100" align="center" />
-      <el-table-column :label="t('wms.safetyStock')" prop="safetyStock" width="100" align="center" />
-      <el-table-column :label="t('wms.stockStatus')" prop="stockStatus" width="100" align="center">
+      <el-table-column v-if="columns.lockedQuantity.visible" :label="t('wms.lockedQuantityLabel')" prop="lockedQuantity" width="100" align="center" />
+      <el-table-column v-if="columns.safetyStock.visible" :label="t('wms.safetyStock')" prop="safetyStock" width="100" align="center" />
+      <el-table-column v-if="columns.stockStatus.visible" :label="t('wms.stockStatus')" prop="stockStatus" width="100" align="center">
         <template #default="scope">
           <el-tag :type="scope.row.isLowStock ? 'danger' : 'success'">
             {{ scope.row.isLowStock ? t('wms.lowStockStatus') : t('wms.normal') }}
@@ -134,6 +142,8 @@
 <script setup lang="ts">
 import * as InventoryReportApi from '@/api/wms/inventoryReport'
 import * as WarehouseApi from '@/api/wms/warehouse'
+import RightToolbar from '@/components/RightToolbar/index.vue'
+import { createWMSColumns } from '@/utils/wms-columns-config'
 
 defineOptions({ name: 'WmsInventoryReport' })
 
@@ -151,6 +161,10 @@ const summary = ref({
   lowStockCount: 0,
   zeroStockCount: 0
 })
+
+// 列设置功能
+const columns = reactive(createWMSColumns(t).inventoryReport)
+const showSearch = ref(true)
 
 const queryParams = reactive({
   pageNo: 1,

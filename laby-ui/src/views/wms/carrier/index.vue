@@ -11,7 +11,7 @@
   @date 2025-10-28
 -->
 <template>
-  <ContentWrap>
+  <ContentWrap v-if="showSearch">
     <!-- 搜索工作栏 -->
     <el-form class="-mb-15px" :model="queryParams" ref="queryFormRef" :inline="true">
       <el-form-item :label="t('wms.carrierCode')" prop="carrierCode">
@@ -44,7 +44,7 @@
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.WMS_CARRIER_TYPE)"
             :key="dict.value"
-            :label="dict.label"
+            :label="getDictLabel(dict)"
             :value="dict.value"
           />
         </el-select>
@@ -60,7 +60,7 @@
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
             :key="dict.value"
-            :label="dict.label"
+            :label="getDictLabel(dict)"
             :value="dict.value"
           />
         </el-select>
@@ -102,23 +102,31 @@
 
   <!-- 列表 -->
   <ContentWrap>
+    <!-- 表格工具栏 -->
+    <div class="flex justify-between items-center mb-4">
+      <div class="text-sm text-gray-600">
+        {{ t('common.total') }}: {{ total }} {{ t('common.items') }}
+      </div>
+      <RightToolbar v-model:showSearch="showSearch" :columns="columns" :search="true" @queryTable="getList" />
+    </div>
+    
     <el-table v-loading="loading" :data="list" stripe>
-      <el-table-column :label="t('wms.carrierCode')" prop="carrierCode" width="140" show-overflow-tooltip />
-      <el-table-column :label="t('wms.carrierName')" prop="carrierName" min-width="160" show-overflow-tooltip />
+      <el-table-column v-if="columns.carrierCode.visible" :label="t('wms.carrierCode')" prop="carrierCode" width="140" show-overflow-tooltip />
+      <el-table-column v-if="columns.carrierName.visible" :label="t('wms.carrierName')" prop="carrierName" min-width="160" show-overflow-tooltip />
       
-      <el-table-column :label="t('wms.carrierType')" prop="carrierType" width="110" align="center">
+      <el-table-column v-if="columns.carrierType.visible" :label="t('wms.carrierType')" prop="carrierType" width="110" align="center">
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.WMS_CARRIER_TYPE" :value="scope.row.carrierType" />
         </template>
       </el-table-column>
       
-      <el-table-column :label="t('wms.contactPerson')" prop="contactPerson" width="100" show-overflow-tooltip />
-      <el-table-column :label="t('wms.contactPhone')" prop="contactPhone" width="130" show-overflow-tooltip />
+      <el-table-column v-if="columns.contactPerson.visible" :label="t('wms.contactPerson')" prop="contactPerson" width="100" show-overflow-tooltip />
+      <el-table-column v-if="columns.contactPhone.visible" :label="t('wms.contactPhone')" prop="contactPhone" width="130" show-overflow-tooltip />
       
-      <el-table-column :label="t('wms.serviceArea')" prop="serviceArea" min-width="150" show-overflow-tooltip />
-      <el-table-column :label="t('wms.timeLimit')" prop="timeLimit" min-width="160" show-overflow-tooltip />
+      <el-table-column v-if="columns.serviceArea.visible" :label="t('wms.serviceArea')" prop="serviceArea" min-width="150" show-overflow-tooltip />
+      <el-table-column v-if="columns.timeLimit.visible" :label="t('wms.timeLimit')" prop="timeLimit" min-width="160" show-overflow-tooltip />
       
-      <el-table-column :label="t('wms.rating')" prop="rating" width="100" align="center">
+      <el-table-column v-if="columns.rating.visible" :label="t('wms.rating')" prop="rating" width="100" align="center">
         <template #default="scope">
           <el-rate
             v-model="scope.row.rating"
@@ -130,25 +138,26 @@
         </template>
       </el-table-column>
       
-      <el-table-column :label="t('wms.cooperationDate')" prop="cooperationStartDate" width="110" align="center">
+      <el-table-column v-if="columns.cooperationStartDate.visible" :label="t('wms.cooperationDate')" prop="cooperationStartDate" width="110" align="center">
         <template #default="scope">
           {{ formatCooperationDate(scope.row.cooperationStartDate) }}
         </template>
       </el-table-column>
       
-      <el-table-column :label="t('wms.status')" prop="status" width="80" align="center">
+      <el-table-column v-if="columns.status.visible" :label="t('wms.status')" prop="status" width="80" align="center">
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
         </template>
       </el-table-column>
       
       <el-table-column
+        v-if="columns.createTime.visible"
         :label="t('common.createTime')"
         prop="createTime"
         width="160"
         align="center"
         :formatter="dateFormatter"
-      />
+             />
       
       <el-table-column :label="t('action.action')" fixed="right" width="160" align="center">
         <template #default="scope">
@@ -187,9 +196,14 @@
 
 <script setup lang="ts">
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { useDictI18n } from '@/hooks/web/useDictI18n'
+
+const { getDictLabel } = useDictI18n() // 字典国际化
 import { formatDate } from '@/utils/formatTime'
 import * as CarrierApi from '@/api/wms/carrier'
 import CarrierForm from './CarrierForm.vue'
+import RightToolbar from '@/components/RightToolbar/index.vue'
+import { createWMSColumns } from '@/utils/wms-columns-config'
 
 defineOptions({ name: 'WmsCarrier' })
 
@@ -199,6 +213,10 @@ const { t } = useI18n()
 const loading = ref(true)
 const list = ref([])
 const total = ref(0)
+
+// 列设置功能
+const columns = reactive(createWMSColumns(t).carrier)
+const showSearch = ref(true)
 
 // 查询参数
 const queryParams = reactive({

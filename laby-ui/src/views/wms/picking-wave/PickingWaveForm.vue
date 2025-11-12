@@ -31,7 +31,7 @@
               <el-option
                 v-for="dict in getIntDictOptions(DICT_TYPE.WMS_WAVE_TYPE)"
                 :key="dict.value"
-                :label="dict.label"
+                :label="getDictLabel(dict)"
                 :value="dict.value"
               />
             </el-select>
@@ -187,9 +187,12 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+import { useDictI18n } from '@/hooks/web/useDictI18n'
 import { dateFormatter } from '@/utils/formatTime'
 import * as PickingWaveApi from '@/api/wms/pickingWave'
 import * as WarehouseApi from '@/api/wms/warehouse'
+
+const { getDictLabel } = useDictI18n() // 字典国际化
 import * as OutboundApi from '@/api/wms/outbound'
 import * as UserApi from '@/api/system/user'
 
