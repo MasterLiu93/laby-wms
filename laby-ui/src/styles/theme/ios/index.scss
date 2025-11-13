@@ -1362,20 +1362,692 @@
       border-color: rgba(0, 122, 255, 0.4);
 
       .el-alert__description {
-        color: var(--ios-text-primary, #ffffff) !important;
+        color: #1e293b;
       }
     }
   }
 }
 
-// ==================== Table 表格组件 - 重新设计 ====================
+// ==================== DaisyUI 风格组件样式 ====================
+
+// DaisyUI 风格搜索框组件 - 浅色模式
+.el-input {
+  &.search-input {
+    .el-input__wrapper {
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      
+      &:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      }
+      
+      &.is-focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        background: #ffffff;
+      }
+    }
+    
+    .el-input__inner {
+      color: #1e293b;
+      font-size: 14px;
+      font-weight: 500;
+      
+      &::placeholder {
+        color: #94a3b8;
+        font-weight: 400;
+      }
+    }
+  }
+}
+
+// DaisyUI 风格文本域组件 - 浅色模式
+.el-textarea {
+  .el-textarea__inner {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    color: #1e293b;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 12px 16px;
+    line-height: 1.6;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    resize: vertical;
+    
+    &:hover {
+      border-color: #cbd5e1;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+    
+    &:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      background: #ffffff;
+      outline: none;
+    }
+    
+    &::placeholder {
+      color: #94a3b8;
+      font-weight: 400;
+    }
+    
+    &:disabled {
+      background: #f1f5f9;
+      color: #94a3b8;
+      cursor: not-allowed;
+    }
+  }
+  
+  &.is-disabled {
+    .el-textarea__inner {
+      background: #f1f5f9;
+      border-color: #e2e8f0;
+      color: #94a3b8;
+      cursor: not-allowed;
+    }
+  }
+  
+  // 字数统计样式
+  .el-input__count {
+    background: rgba(255, 255, 255, 0.9);
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 6px;
+    backdrop-filter: blur(4px);
+  }
+}
+
+// DaisyUI 风格卡片组件 - 浅色模式
+.el-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:hover {
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+  }
+  
+  .el-card__header {
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    color: #1e293b;
+    font-weight: 600;
+    border-radius: 16px 16px 0 0;
+  }
+  
+  .el-card__body {
+    color: #475569;
+    line-height: 1.6;
+  }
+}
+
+// DaisyUI 风格对话框组件 - 浅色模式
+.el-dialog {
+  border-radius: 16px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  border: none;
+  background: #ffffff;
+  
+  &__header {
+    background: #f8fafc;
+    border-radius: 16px 16px 0 0;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  &__title {
+    color: #1e293b;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  
+  &__close {
+    color: #64748b;
+    font-size: 20px;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      color: #ef4444;
+      transform: scale(1.1);
+    }
+  }
+  
+  &__body {
+    color: #475569;
+    line-height: 1.6;
+  }
+}
+
+// DaisyUI 风格提示框组件 - 浅色模式
+.el-tooltip__popper {
+  background: #1e293b !important;
+  color: #f1f5f9 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25) !important;
+  font-weight: 500 !important;
+  
+  .el-tooltip__arrow::before {
+    background: #1e293b !important;
+    border: none !important;
+  }
+}
+
+// DaisyUI 风格气泡提示组件 - 浅色模式
+.el-popover {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+  
+  .el-popover__title {
+    color: #1e293b;
+    font-weight: 600;
+  }
+  
+  .el-popover__content {
+    color: #475569;
+    line-height: 1.6;
+  }
+}
+
+// DaisyUI 风格下拉菜单组件 - 浅色模式
+.el-dropdown-menu {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+  padding: 8px !important;
+  
+  .el-dropdown-menu__item {
+    color: #475569 !important;
+    border-radius: 8px !important;
+    margin: 2px 0 !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+    
+    &:hover {
+      background: #f1f5f9 !important;
+      color: #1e293b !important;
+      transform: translateX(4px) !important;
+    }
+    
+    &.is-divided {
+      border-top: 1px solid #e2e8f0 !important;
+      margin-top: 8px !important;
+    }
+  }
+}
+
+// DaisyUI 风格单选框组件 - 浅色模式
+.el-radio {
+  margin-right: 16px;
+  
+  .el-radio__input {
+    .el-radio__inner {
+      position: relative;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #d1d5db;
+      border-radius: 50%;
+      background: #ffffff;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      
+      &:hover {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+      
+      &::after {
+        content: '';
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #ffffff;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+    }
+    
+    &.is-checked {
+      .el-radio__inner {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        border-color: #3b82f6;
+        
+        &::after {
+          transform: translate(-50%, -50%) scale(1);
+        }
+      }
+    }
+    
+    &.is-disabled {
+      .el-radio__inner {
+        background: #f3f4f6;
+        border-color: #d1d5db;
+        cursor: not-allowed;
+        
+        &::after {
+          background: #9ca3af;
+        }
+      }
+    }
+  }
+  
+  .el-radio__label {
+    color: #374151;
+    font-size: 14px;
+    font-weight: 500;
+    padding-left: 8px;
+    
+    &:hover {
+      color: #1f2937;
+    }
+  }
+  
+  &.is-disabled {
+    .el-radio__label {
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// DaisyUI 风格复选框组件 - 浅色模式
+.el-checkbox {
+  margin-right: 16px;
+  
+  .el-checkbox__input {
+    .el-checkbox__inner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid #d1d5db;
+      border-radius: 4px;
+      background: #ffffff;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      
+      &:hover {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+      
+      &::after {
+        border: 2px solid #ffffff;
+        border-left: 0;
+        border-top: 0;
+        height: 8px;
+        width: 4px;
+        transform: rotate(45deg) scaleY(0);
+        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        left: 5px;
+        top: 1px;
+      }
+    }
+    
+    &.is-checked {
+      .el-checkbox__inner {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        border-color: #3b82f6;
+        
+        &::after {
+          transform: rotate(45deg) scaleY(1);
+        }
+      }
+    }
+    
+    &.is-indeterminate {
+      .el-checkbox__inner {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        border-color: #3b82f6;
+        
+        &::before {
+          content: '';
+          position: absolute;
+          display: block;
+          background: #ffffff;
+          height: 2px;
+          width: 10px;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+        }
+        
+        &::after {
+          display: none;
+        }
+      }
+    }
+    
+    &.is-disabled {
+      .el-checkbox__inner {
+        background: #f3f4f6;
+        border-color: #d1d5db;
+        cursor: not-allowed;
+        
+        &::after {
+          border-color: #9ca3af;
+        }
+      }
+    }
+  }
+  
+  .el-checkbox__label {
+    color: #374151;
+    font-size: 14px;
+    font-weight: 500;
+    padding-left: 8px;
+    
+    &:hover {
+      color: #1f2937;
+    }
+  }
+  
+  &.is-disabled {
+    .el-checkbox__label {
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// DaisyUI 风格标签组件 - 浅色模式优化
+.el-tag {
+  border-radius: 20px;
+  font-weight: 500;
+  font-size: 12px;
+  padding: 4px 12px;
+  border: none;
+  
+  &--success {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #ffffff;
+  }
+  
+  &--warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #ffffff;
+  }
+  
+  &--danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #ffffff;
+  }
+  
+  &--info {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: #ffffff;
+  }
+  
+  .el-tag__close {
+    color: rgba(255, 255, 255, 0.8);
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+    }
+  }
+}
+
+// DaisyUI 风格分页组件 - 浅色模式
+.el-pagination {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  // 页码按钮
+  .el-pager {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    
+    li {
+      min-width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #6b7280;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      
+      &:hover {
+        color: #3b82f6;
+        background: #f8fafc;
+        border-color: #3b82f6;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+      }
+      
+      &.is-active {
+        color: #ffffff;
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        border-color: #3b82f6;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        
+        &:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+      }
+      
+      &.is-disabled {
+        color: #d1d5db;
+        background: #f9fafb;
+        border-color: #f3f4f6;
+        cursor: not-allowed;
+        
+        &:hover {
+          transform: none;
+          box-shadow: none;
+        }
+      }
+    }
+  }
+  
+  // 上一页/下一页按钮
+  .btn-prev,
+  .btn-next {
+    min-width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6b7280;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    &:hover {
+      color: #3b82f6;
+      background: #f8fafc;
+      border-color: #3b82f6;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+    }
+    
+    &.is-disabled {
+      color: #d1d5db;
+      background: #f9fafb;
+      border-color: #f3f4f6;
+      cursor: not-allowed;
+      
+      &:hover {
+        transform: none;
+        box-shadow: none;
+        color: #d1d5db;
+        background: #f9fafb;
+        border-color: #f3f4f6;
+      }
+    }
+  }
+  
+  // 跳转输入框
+  .el-pagination__jump {
+    display: flex;
+    align-items: center;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    
+    .el-input {
+      margin: 0 8px;
+      width: 60px;
+      
+      .el-input__wrapper {
+        height: 36px;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        
+        &:hover {
+          border-color: #3b82f6;
+        }
+        
+        &.is-focus {
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+      }
+      
+      .el-input__inner {
+        text-align: center;
+        font-weight: 500;
+        color: #374151;
+      }
+    }
+  }
+  
+  // 每页显示数量选择
+  .el-pagination__sizes {
+    .el-select {
+      .el-select__wrapper {
+        height: 36px;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 0 12px;
+        
+        &:hover {
+          border-color: #3b82f6;
+        }
+        
+        &.is-focused {
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+      }
+      
+      .el-select__selected-item {
+        color: #374151;
+        font-weight: 500;
+      }
+    }
+  }
+  
+  // 总数显示
+  .el-pagination__total {
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  
+  // 省略号
+  .el-pager li.more {
+    color: #9ca3af;
+    
+    &:hover {
+      color: #3b82f6;
+    }
+  }
+}
+
+// DaisyUI 风格按钮组件 - 浅色模式
+.el-button {
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &--primary {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border-color: transparent;
+    color: #ffffff;
+    
+    &:hover {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+  }
+  
+  &--success {
+    background: linear-gradient(135deg, #10b981, #059669);
+    border-color: transparent;
+    color: #ffffff;
+    
+    &:hover {
+      background: linear-gradient(135deg, #059669, #047857);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+  }
+  
+  &--warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border-color: transparent;
+    color: #ffffff;
+    
+    &:hover {
+      background: linear-gradient(135deg, #d97706, #b45309);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+    }
+  }
+  
+  &--danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border-color: transparent;
+    color: #ffffff;
+    
+    &:hover {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    }
+  }
+}
+
+// ==================== DaisyUI 风格表格组件 ====================
 .el-table {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--ios-bg-secondary);
+  background: #ffffff;
   border-radius: 12px;
-  border: 1px solid rgba(142, 142, 147, 0.15);
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e2e8f0;
 
   // 表头设计
   &__header {
@@ -1552,6 +2224,661 @@
 
     &__loading-text {
       color: var(--ios-text-secondary, #aeaeb2);
+    }
+  }
+
+  // ==================== DaisyUI 风格搜索框组件 ====================
+  .el-input {
+    &.search-input {
+      .el-input__wrapper {
+        background: #1c1c1e !important;
+        border: 2px solid rgba(142, 142, 147, 0.3) !important;
+        border-radius: 12px !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+        
+        &:hover {
+          border-color: rgba(142, 142, 147, 0.5) !important;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4) !important;
+        }
+        
+        &.is-focus {
+          border-color: #007AFF !important;
+          box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3) !important;
+        }
+      }
+      
+      .el-input__inner {
+        color: #ffffff !important;
+        font-weight: 500 !important;
+        
+        &::placeholder {
+          color: rgba(255, 255, 255, 0.6) !important;
+        }
+      }
+    }
+  }
+
+  // ==================== DaisyUI 风格卡片组件 ====================
+  .el-card {
+    background: #1c1c1e !important;
+    border: 1px solid rgba(142, 142, 147, 0.3) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+    
+    &:hover {
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+      transform: translateY(-2px);
+    }
+    
+    .el-card__header {
+      background: #2c2c2e !important;
+      border-bottom: 1px solid rgba(142, 142, 147, 0.3) !important;
+      color: #ffffff !important;
+      font-weight: 600 !important;
+    }
+    
+    .el-card__body {
+      color: #ffffff !important;
+    }
+  }
+
+  // ==================== DaisyUI 风格对话框组件 ====================
+  .el-dialog {
+    background: #1c1c1e !important;
+    border-radius: 16px !important;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6) !important;
+    
+    &__header {
+      background: #2c2c2e !important;
+      border-bottom: 1px solid rgba(142, 142, 147, 0.3) !important;
+    }
+    
+    &__title {
+      color: #ffffff !important;
+      font-weight: 600 !important;
+    }
+    
+    &__close {
+      color: rgba(255, 255, 255, 0.7) !important;
+      
+      &:hover {
+        color: #FF3B30 !important;
+      }
+    }
+    
+    &__body {
+      background: #1c1c1e !important;
+      color: #ffffff !important;
+    }
+    
+    &__footer {
+      background: #1c1c1e !important;
+    }
+  }
+
+  // ==================== DaisyUI 风格提示框组件 ====================
+  .el-tooltip__popper {
+    background: #2c2c2e !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(142, 142, 147, 0.4) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+    font-weight: 500 !important;
+    
+    .el-tooltip__arrow::before {
+      background: #2c2c2e !important;
+      border: 1px solid rgba(142, 142, 147, 0.4) !important;
+    }
+  }
+
+  // ==================== DaisyUI 风格气泡提示组件 ====================
+  .el-popover {
+    background: #1c1c1e !important;
+    border: 1px solid rgba(142, 142, 147, 0.4) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+    
+    .el-popover__title {
+      color: #ffffff !important;
+      font-weight: 600 !important;
+    }
+    
+    .el-popover__content {
+      color: rgba(255, 255, 255, 0.9) !important;
+    }
+  }
+
+  // ==================== DaisyUI 风格下拉菜单组件 ====================
+  .el-dropdown-menu {
+    background: #1c1c1e !important;
+    border: 1px solid rgba(142, 142, 147, 0.4) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+    
+    .el-dropdown-menu__item {
+      color: #ffffff !important;
+      border-radius: 8px !important;
+      margin: 2px 4px !important;
+      font-weight: 500 !important;
+      
+      &:hover {
+        background: rgba(142, 142, 147, 0.3) !important;
+        color: #ffffff !important;
+      }
+      
+      &.is-divided {
+        border-top: 1px solid rgba(142, 142, 147, 0.3) !important;
+      }
+    }
+  }
+
+  // DaisyUI 风格文本域组件 - 深色模式优化
+  .el-textarea {
+    .el-textarea__inner {
+      background: #1c1c1e !important;
+      border: 2px solid rgba(142, 142, 147, 0.3) !important;
+      border-radius: 12px !important;
+      color: #ffffff !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      padding: 12px 16px !important;
+      line-height: 1.6 !important;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      resize: vertical !important;
+      
+      &:hover {
+        border-color: rgba(142, 142, 147, 0.5) !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4) !important;
+      }
+      
+      &:focus {
+        border-color: #007AFF !important;
+        box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3) !important;
+        background: #2c2c2e !important;
+        outline: none !important;
+      }
+      
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.6) !important;
+        font-weight: 400 !important;
+      }
+      
+      &:disabled {
+        background: rgba(142, 142, 147, 0.1) !important;
+        color: rgba(255, 255, 255, 0.4) !important;
+        cursor: not-allowed !important;
+      }
+    }
+    
+    &.is-disabled {
+      .el-textarea__inner {
+        background: rgba(142, 142, 147, 0.1) !important;
+        border-color: rgba(142, 142, 147, 0.2) !important;
+        color: rgba(255, 255, 255, 0.4) !important;
+        cursor: not-allowed !important;
+      }
+    }
+    
+    // 字数统计样式 - 深色模式
+    .el-input__count {
+      background: rgba(44, 44, 46, 0.9) !important;
+      color: rgba(255, 255, 255, 0.8) !important;
+      font-size: 12px !important;
+      font-weight: 500 !important;
+      padding: 2px 8px !important;
+      border-radius: 6px !important;
+      backdrop-filter: blur(4px) !important;
+      border: 1px solid rgba(142, 142, 147, 0.3) !important;
+    }
+  }
+
+  // DaisyUI 风格单选框组件 - 深色模式优化
+  .el-radio {
+    margin-right: 16px !important;
+    
+    .el-radio__input {
+      .el-radio__inner {
+        position: relative !important;
+        width: 18px !important;
+        height: 18px !important;
+        border: 2px solid rgba(142, 142, 147, 0.6) !important;
+        border-radius: 50% !important;
+        background: #1c1c1e !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        
+        &:hover {
+          border-color: #007AFF !important;
+          box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3) !important;
+        }
+        
+        &::after {
+          content: '' !important;
+          position: absolute !important;
+          width: 6px !important;
+          height: 6px !important;
+          border-radius: 50% !important;
+          background: #ffffff !important;
+          left: 50% !important;
+          top: 50% !important;
+          transform: translate(-50%, -50%) scale(0) !important;
+          transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+      }
+      
+      &.is-checked {
+        .el-radio__inner {
+          background: linear-gradient(135deg, #007AFF, #0056D6) !important;
+          border-color: #007AFF !important;
+          
+          &::after {
+            transform: translate(-50%, -50%) scale(1) !important;
+          }
+        }
+      }
+      
+      &.is-disabled {
+        .el-radio__inner {
+          background: rgba(142, 142, 147, 0.1) !important;
+          border-color: rgba(142, 142, 147, 0.3) !important;
+          cursor: not-allowed !important;
+          
+          &::after {
+            background: rgba(255, 255, 255, 0.4) !important;
+          }
+        }
+      }
+    }
+    
+    .el-radio__label {
+      color: #ffffff !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      padding-left: 8px !important;
+      
+      &:hover {
+        color: #ffffff !important;
+      }
+    }
+    
+    &.is-disabled {
+      .el-radio__label {
+        color: rgba(255, 255, 255, 0.4) !important;
+        cursor: not-allowed !important;
+      }
+    }
+  }
+
+  // DaisyUI 风格复选框组件 - 深色模式优化
+  .el-checkbox {
+    margin-right: 16px !important;
+    
+    .el-checkbox__input {
+      .el-checkbox__inner {
+        width: 18px !important;
+        height: 18px !important;
+        border: 2px solid rgba(142, 142, 147, 0.6) !important;
+        border-radius: 4px !important;
+        background: #1c1c1e !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        
+        &:hover {
+          border-color: #007AFF !important;
+          box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3) !important;
+        }
+        
+        &::after {
+          border: 2px solid #ffffff !important;
+          border-left: 0 !important;
+          border-top: 0 !important;
+          height: 8px !important;
+          width: 4px !important;
+          transform: rotate(45deg) scaleY(0) !important;
+          transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+          left: 5px !important;
+          top: 1px !important;
+        }
+      }
+      
+      &.is-checked {
+        .el-checkbox__inner {
+          background: linear-gradient(135deg, #007AFF, #0056D6) !important;
+          border-color: #007AFF !important;
+          
+          &::after {
+            transform: rotate(45deg) scaleY(1) !important;
+          }
+        }
+      }
+      
+      &.is-indeterminate {
+        .el-checkbox__inner {
+          background: linear-gradient(135deg, #007AFF, #0056D6) !important;
+          border-color: #007AFF !important;
+          
+          &::before {
+            content: '' !important;
+            position: absolute !important;
+            display: block !important;
+            background: #ffffff !important;
+            height: 2px !important;
+            width: 10px !important;
+            left: 50% !important;
+            top: 50% !important;
+            transform: translate(-50%, -50%) !important;
+          }
+          
+          &::after {
+            display: none !important;
+          }
+        }
+      }
+      
+      &.is-disabled {
+        .el-checkbox__inner {
+          background: rgba(142, 142, 147, 0.1) !important;
+          border-color: rgba(142, 142, 147, 0.3) !important;
+          cursor: not-allowed !important;
+          
+          &::after {
+            border-color: rgba(255, 255, 255, 0.4) !important;
+          }
+        }
+      }
+    }
+    
+    .el-checkbox__label {
+      color: #ffffff !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      padding-left: 8px !important;
+      
+      &:hover {
+        color: #ffffff !important;
+      }
+    }
+    
+    &.is-disabled {
+      .el-checkbox__label {
+        color: rgba(255, 255, 255, 0.4) !important;
+        cursor: not-allowed !important;
+      }
+    }
+  }
+
+  // DaisyUI 风格标签组件 - 深色模式优化
+  .el-tag {
+    border-radius: 20px !important;
+    font-weight: 500 !important;
+    font-size: 12px !important;
+    padding: 4px 12px !important;
+    border: none !important;
+    
+    &--success {
+      background: linear-gradient(135deg, #10b981, #059669) !important;
+      color: #ffffff !important;
+    }
+    
+    &--warning {
+      background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+      color: #ffffff !important;
+    }
+    
+    &--danger {
+      background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+      color: #ffffff !important;
+    }
+    
+    &--info {
+      background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+      color: #ffffff !important;
+    }
+    
+    .el-tag__close {
+      color: rgba(255, 255, 255, 0.8) !important;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.2) !important;
+        color: #ffffff !important;
+      }
+    }
+  }
+
+  // DaisyUI 风格分页组件 - 深色模式优化
+  .el-pagination {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    
+    // 页码按钮 - 深色模式
+    .el-pager {
+      display: flex !important;
+      align-items: center !important;
+      gap: 4px !important;
+      
+      li {
+        min-width: 36px !important;
+        height: 36px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border-radius: 8px !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        color: rgba(255, 255, 255, 0.8) !important;
+        background: #2c2c2e !important;
+        border: 1px solid rgba(142, 142, 147, 0.3) !important;
+        cursor: pointer !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        
+        &:hover {
+          color: #007AFF !important;
+          background: #3a3a3c !important;
+          border-color: #007AFF !important;
+          transform: translateY(-1px) !important;
+          box-shadow: 0 2px 4px rgba(0, 122, 255, 0.2) !important;
+        }
+        
+        &.is-active {
+          color: #ffffff !important;
+          background: linear-gradient(135deg, #007AFF, #0056D6) !important;
+          border-color: #007AFF !important;
+          box-shadow: 0 2px 8px rgba(0, 122, 255, 0.4) !important;
+          
+          &:hover {
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.5) !important;
+          }
+        }
+        
+        &.is-disabled {
+          color: rgba(255, 255, 255, 0.3) !important;
+          background: rgba(142, 142, 147, 0.1) !important;
+          border-color: rgba(142, 142, 147, 0.2) !important;
+          cursor: not-allowed !important;
+          
+          &:hover {
+            transform: none !important;
+            box-shadow: none !important;
+          }
+        }
+      }
+    }
+    
+    // 上一页/下一页按钮 - 深色模式
+    .btn-prev,
+    .btn-next {
+      min-width: 36px !important;
+      height: 36px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      border-radius: 8px !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      color: rgba(255, 255, 255, 0.8) !important;
+      background: #2c2c2e !important;
+      border: 1px solid rgba(142, 142, 147, 0.3) !important;
+      cursor: pointer !important;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      
+      &:hover {
+        color: #007AFF !important;
+        background: #3a3a3c !important;
+        border-color: #007AFF !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 2px 4px rgba(0, 122, 255, 0.2) !important;
+      }
+      
+      &.is-disabled {
+        color: rgba(255, 255, 255, 0.3) !important;
+        background: rgba(142, 142, 147, 0.1) !important;
+        border-color: rgba(142, 142, 147, 0.2) !important;
+        cursor: not-allowed !important;
+        
+        &:hover {
+          transform: none !important;
+          box-shadow: none !important;
+          color: rgba(255, 255, 255, 0.3) !important;
+          background: rgba(142, 142, 147, 0.1) !important;
+          border-color: rgba(142, 142, 147, 0.2) !important;
+        }
+      }
+    }
+    
+    // 跳转输入框 - 深色模式
+    .el-pagination__jump {
+      display: flex !important;
+      align-items: center !important;
+      color: rgba(255, 255, 255, 0.8) !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      
+      .el-input {
+        margin: 0 8px !important;
+        width: 60px !important;
+        
+        .el-input__wrapper {
+          height: 36px !important;
+          background: #2c2c2e !important;
+          border: 1px solid rgba(142, 142, 147, 0.3) !important;
+          border-radius: 8px !important;
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+          
+          &:hover {
+            border-color: #007AFF !important;
+          }
+          
+          &.is-focus {
+            border-color: #007AFF !important;
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3) !important;
+          }
+        }
+        
+        .el-input__inner {
+          text-align: center !important;
+          font-weight: 500 !important;
+          color: #ffffff !important;
+        }
+      }
+    }
+    
+    // 每页显示数量选择 - 深色模式
+    .el-pagination__sizes {
+      .el-select {
+        .el-select__wrapper {
+          height: 36px !important;
+          background: #2c2c2e !important;
+          border: 1px solid rgba(142, 142, 147, 0.3) !important;
+          border-radius: 8px !important;
+          padding: 0 12px !important;
+          
+          &:hover {
+            border-color: #007AFF !important;
+          }
+          
+          &.is-focused {
+            border-color: #007AFF !important;
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3) !important;
+          }
+        }
+        
+        .el-select__selected-item {
+          color: #ffffff !important;
+          font-weight: 500 !important;
+        }
+      }
+    }
+    
+    // 总数显示 - 深色模式
+    .el-pagination__total {
+      color: rgba(255, 255, 255, 0.8) !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+    }
+    
+    // 省略号 - 深色模式
+    .el-pager li.more {
+      color: rgba(255, 255, 255, 0.5) !important;
+      
+      &:hover {
+        color: #007AFF !important;
+      }
+    }
+  }
+
+  // DaisyUI 风格按钮组件 - 深色模式优化
+  .el-button {
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    
+    &--primary {
+      background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+      border-color: transparent !important;
+      color: #ffffff !important;
+      
+      &:hover {
+        background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
+      }
+    }
+    
+    &--success {
+      background: linear-gradient(135deg, #10b981, #059669) !important;
+      border-color: transparent !important;
+      color: #ffffff !important;
+      
+      &:hover {
+        background: linear-gradient(135deg, #059669, #047857) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4) !important;
+      }
+    }
+    
+    &--warning {
+      background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+      border-color: transparent !important;
+      color: #ffffff !important;
+      
+      &:hover {
+        background: linear-gradient(135deg, #d97706, #b45309) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4) !important;
+      }
+    }
+    
+    &--danger {
+      background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+      border-color: transparent !important;
+      color: #ffffff !important;
+      
+      &:hover {
+        background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4) !important;
+      }
     }
   }
 }
