@@ -6,6 +6,12 @@
  */
 import request from '@/config/axios'
 
+// 商品分类状态常量
+export const CATEGORY_STATUS = {
+  ENABLE: 1,  // 启用
+  DISABLE: 0  // 禁用
+}
+
 /**
  * 商品分类 VO
  * 用于商品分类的数据传输
@@ -21,6 +27,7 @@ export interface GoodsCategoryVO {
   parentId?: number // 父分类ID，0表示顶级分类
   level?: number // 分类层级（后端自动计算，前端不需要传）
   sort?: number // 排序号，数字越小越靠前
+  status?: number // 状态：1-启用，0-禁用
   createTime?: Date // 创建时间
 }
 
@@ -127,7 +134,7 @@ function buildTree(list: any[], parentId: number = 0): any[] {
         parentId: item.parentId,
         level: item.level,
         sort: item.sort,
-        status: item.status,
+        status: item.status ?? CATEGORY_STATUS.ENABLE, // 默认启用状态
         createTime: item.createTime,
         label: item.categoryName,
         value: item.id,
@@ -141,5 +148,16 @@ function buildTree(list: any[], parentId: number = 0): any[] {
   tree.sort((a, b) => (a.sort || 0) - (b.sort || 0))
   
   return tree
+}
+
+// 更新商品分类状态
+export const updateGoodsCategoryStatus = (id: number, status: number) => {
+  return request.put({
+    url: `/wms/goods-category/update-status`,
+    params: {
+      id,
+      status
+    }
+  })
 }
 

@@ -85,6 +85,15 @@ public class GoodsCategoryController {
         return success(true);
     }
 
+    @PutMapping("/update-status")
+    @Operation(summary = "更新商品分类状态")
+    @ApiAccessLog(operateType = UPDATE)
+    @PreAuthorize("@ss.hasPermission('wms:category:update')")
+    public CommonResult<Boolean> updateGoodsCategoryStatus(@RequestParam("id") Long id, @RequestParam("status") Integer status) {
+        goodsCategoryService.updateGoodsCategoryStatus(id, status);
+        return success(true);
+    }
+
     /**
      * 删除商品分类
      * 

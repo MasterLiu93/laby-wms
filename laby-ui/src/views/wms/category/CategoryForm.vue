@@ -57,6 +57,14 @@
           class="!w-full" 
         />
       </el-form-item>
+      
+      <!-- 状态 -->
+      <el-form-item :label="t('common.status')" prop="status">
+        <el-radio-group v-model="formData.status">
+          <el-radio :label="CATEGORY_STATUS.ENABLE">{{ t('common.enable') }}</el-radio>
+          <el-radio :label="CATEGORY_STATUS.DISABLE">{{ t('common.disable') }}</el-radio>
+        </el-radio-group>
+      </el-form-item>
     </el-form>
     
     <template #footer>
@@ -69,6 +77,7 @@
 <script setup lang="ts">
 import { handleTree } from '@/utils/tree'
 import * as GoodsCategoryApi from '@/api/wms/category'
+import { CATEGORY_STATUS } from '@/api/wms/category'
 
 /** 商品分类表单 */
 defineOptions({ name: 'CategoryForm' })
@@ -80,7 +89,7 @@ const dialogVisible = ref(false) // 弹窗的是否展示
 const dialogTitle = ref('') // 弹窗的标题
 const formLoading = ref(false) // 表单的加载中
 const formType = ref('') // 表单的类型：create - 新增；update - 修改
-const categoryTree = ref([]) // 分类树（用于父分类选择）
+const categoryTree = ref<any[]>([]) // 分类树（用于父分类选择）
 
 // 树形选择器配置（指定显示字段为 categoryName）
 const treeProps = {
@@ -94,7 +103,8 @@ const formData = ref({
   id: undefined, // 分类ID（编辑时必传）
   parentId: 0, // 父分类ID，默认0表示顶级分类
   categoryName: undefined, // 分类名称
-  sort: 0 // 排序，默认0
+  sort: 0, // 排序，默认0
+  status: CATEGORY_STATUS.ENABLE // 状态，默认启用
 })
 
 // 表单验证规则
@@ -126,7 +136,8 @@ const open = async (type: string, id?: number) => {
         id: data.id,
         parentId: data.parentId || 0,
         categoryName: data.categoryName,
-        sort: data.sort || 0
+        sort: data.sort || 0,
+        status: data.status ?? CATEGORY_STATUS.ENABLE
       }
     } finally {
       formLoading.value = false
@@ -195,7 +206,8 @@ const resetForm = () => {
     id: undefined,
     parentId: 0,
     categoryName: undefined,
-    sort: 0
+    sort: 0,
+    status: CATEGORY_STATUS.ENABLE
   }
   formRef.value?.resetFields()
 }

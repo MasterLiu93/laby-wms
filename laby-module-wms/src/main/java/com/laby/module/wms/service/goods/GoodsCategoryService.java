@@ -56,6 +56,20 @@ public interface GoodsCategoryService {
     void updateGoodsCategory(@Valid GoodsCategorySaveReqVO updateReqVO);
 
     /**
+     * 更新商品分类状态
+     * 
+     * 业务规则：
+     * - 分类必须存在
+     * - 禁用父分类前，必须先禁用所有启用状态的子分类（递归检查）
+     * - 启用分类无限制
+     * 
+     * @param id 分类ID
+     * @param status 状态：0-启用，1-禁用
+     * @throws com.laby.framework.common.exception.ServiceException 如果分类不存在或有启用的子分类
+     */
+    void updateGoodsCategoryStatus(Long id, Integer status);
+
+    /**
      * 删除商品分类
      * 
      * 业务规则：

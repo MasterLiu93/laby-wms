@@ -28,6 +28,7 @@ public interface ErrorCodeConstants {
     // ========== 商品分类 1-020-004-000 ==========
     ErrorCode GOODS_CATEGORY_NOT_EXISTS = new ErrorCode(1_020_004_000, "商品分类不存在");
     ErrorCode GOODS_CATEGORY_CODE_DUPLICATE = new ErrorCode(1_020_004_001, "分类编码已存在");
+    ErrorCode GOODS_CATEGORY_HAS_ENABLED_CHILDREN = new ErrorCode(1_020_004_002, "商品分类存在启用的子分类，无法禁用");
     
     // ========== 商品管理 1-020-004-100 ==========
     ErrorCode GOODS_NOT_EXISTS = new ErrorCode(1_020_004_100, "商品不存在");

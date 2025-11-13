@@ -86,6 +86,7 @@
       <RightToolbar v-model:showSearch="showSearch" :search="true" @queryTable="getList" />
     </div>
     <el-table
+      ref="tableRef"
       v-loading="loading"
       :data="list"
       row-key="id"
@@ -104,7 +105,17 @@
       <el-table-column prop="sort" :label="t('wms.categorySort')" min-width="120" show-overflow-tooltip align="center" />
       <el-table-column :label="t('common.status')" min-width="120" show-overflow-tooltip align="center">
         <template #default="scope">
-          <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
+          <!-- 如果没有权限，显示标签 -->
+          <dict-tag v-if="!checkPermi(['wms:category:update'])" :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
+          <!-- 如果有权限，显示开关 -->
+          <el-switch
+            v-else
+            v-model="scope.row.status"
+            :active-value="CATEGORY_STATUS.ENABLE"
+            :inactive-value="CATEGORY_STATUS.DISABLE"
+            :loading="categoryStatusUpdating[scope.row.id]"
+            @change="handleStatusChange(scope.row, $event)"
+          />
         </template>
       </el-table-column>
       <el-table-column
@@ -155,7 +166,9 @@
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { useDictI18n } from '@/hooks/web/useDictI18n'
 import { dateFormatter } from '@/utils/formatTime'
+import { checkPermi } from '@/utils/permission'
 import * as GoodsCategoryApi from '@/api/wms/category'
+import { CATEGORY_STATUS } from '@/api/wms/category'
 import CategoryForm from './CategoryForm.vue'
 import RightToolbar from '@/components/RightToolbar/index.vue'
 
@@ -170,6 +183,9 @@ const loading = ref(true) // 列表加载中
 const list = ref<any[]>([]) // 树形列表数据
 const expandAll = ref(false) // 是否展开所有节点
 const showSearch = ref(true) // 显示搜索
+const tableRef = ref() // 表格引用
+const categoryStatusUpdating = ref<Record<number, boolean>>({}) // 分类状态更新中的映射
+const isInitializing = ref(true) // 是否正在初始化（防止初始化时触发change事件）
 
 // 查询参数
 const queryParams = reactive({
@@ -190,6 +206,10 @@ const getList = async () => {
     list.value = handleTree(data, 'id', 'parentId')
   } finally {
     loading.value = false
+    // 数据加载完成后，延迟一下再允许触发change事件
+    setTimeout(() => {
+      isInitializing.value = false
+    }, 100)
   }
 }
 
@@ -265,10 +285,68 @@ const resetQuery = () => {
 }
 
 /**
+ * 处理状态切换
+ * 参考菜单实现：直接修改整个对象然后调用更新接口
+ */
+const handleStatusChange = async (row: any, newValue: any) => {
+  // 防止初始化时触发
+  if (isInitializing.value) {
+    return
+  }
+  
+  // 保存原始状态，因为el-switch的v-model已经自动更新了row.status
+  // 如果newValue是启用(1)，说明原来是禁用(0)；如果newValue是禁用(0)，说明原来是启用(1)
+  const oldValue = newValue === CATEGORY_STATUS.ENABLE ? CATEGORY_STATUS.DISABLE : CATEGORY_STATUS.ENABLE
+  
+  // 标记更新中
+  categoryStatusUpdating.value[row.id] = true
+  try {
+    // 调用完整更新接口，传递整个对象（参考菜单实现）
+    const updateData = { ...row, status: newValue }
+    await GoodsCategoryApi.updateGoodsCategory(updateData)
+    message.success(t('common.updateSuccess'))
+  } catch (error: any) {
+    // 失败时恢复原状态
+    row.status = oldValue
+    console.log('状态切换失败，恢复到原状态:', oldValue)
+    // 提取后端返回的具体错误信息
+    const errorMessage = error?.response?.data?.msg || error?.message || '更新失败'
+    message.error(errorMessage)
+  } finally {
+    // 标记更新完成
+    categoryStatusUpdating.value[row.id] = false
+  }
+}
+
+/**
  * 展开/折叠所有节点
  */
 const toggleExpandAll = () => {
   expandAll.value = !expandAll.value
+  
+  // 递归获取所有有子节点的行数据
+  const getAllParentRows = (nodes: any[]): any[] => {
+    let rows: any[] = []
+    for (const node of nodes) {
+      if (node.children && node.children.length > 0) {
+        rows.push(node)
+        rows = rows.concat(getAllParentRows(node.children))
+      }
+    }
+    return rows
+  }
+  
+  // 等待下一个tick，确保表格已渲染
+  nextTick(() => {
+    if (tableRef.value && list.value.length > 0) {
+      const parentRows = getAllParentRows(list.value)
+      
+      // 展开或折叠所有父节点
+      parentRows.forEach(row => {
+        tableRef.value.toggleRowExpansion(row, expandAll.value)
+      })
+    }
+  })
 }
 
 /**

@@ -72,11 +72,15 @@ public class GoodsCategoryDO extends TenantBaseDO {
 
     /**
      * 状态
-     * 0-禁用，1-启用
-     * 
-     * 枚举 {@link com.laby.framework.common.enums.CommonStatusEnum}
+     * 1-启用，0-禁用
      */
     private Integer status;
+
+    /**
+     * 状态常量
+     */
+    public static final Integer STATUS_ENABLE = 1;  // 启用
+    public static final Integer STATUS_DISABLE = 0; // 禁用
 
 }
 

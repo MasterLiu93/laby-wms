@@ -76,4 +76,30 @@ public interface GoodsCategoryMapper extends BaseMapperX<GoodsCategoryDO> {
                 .orderByAsc(GoodsCategoryDO::getId));
     }
 
+    /**
+     * 根据分类名称查询分类（用于校验重复）
+     * 
+     * @param categoryName 分类名称
+     * @param excludeId 排除的分类ID（用于更新时排除自己）
+     * @return 分类信息，如果不存在返回null
+     */
+    default GoodsCategoryDO selectByCategoryName(String categoryName, Long excludeId) {
+        return selectOne(new LambdaQueryWrapperX<GoodsCategoryDO>()
+                .eq(GoodsCategoryDO::getCategoryName, categoryName)
+                .ne(excludeId != null, GoodsCategoryDO::getId, excludeId));
+    }
+
+    /**
+     * 查询指定分类下所有启用状态的直接子分类
+     * 
+     * @param parentId 父分类ID
+     * @return 启用状态的子分类列表
+     */
+    default List<GoodsCategoryDO> selectEnabledChildrenByCategoryId(Long parentId) {
+        return selectList(new LambdaQueryWrapperX<GoodsCategoryDO>()
+                .eq(GoodsCategoryDO::getParentId, parentId)
+                .eq(GoodsCategoryDO::getStatus, GoodsCategoryDO.STATUS_ENABLE) // 启用状态
+                .orderByAsc(GoodsCategoryDO::getSort));
+    }
+
 }

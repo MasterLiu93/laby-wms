@@ -30,5 +30,8 @@ public class GoodsCategorySaveReqVO {
     @Schema(description = "显示排序（数字越小越靠前）", example = "0")
     private Integer sort;
 
+    @Schema(description = "状态（0-禁用，1-启用）", example = "1")
+    private Integer status;
+
 }
 

@@ -26,6 +26,9 @@ public class GoodsCategoryRespVO {
     @Schema(description = "排序", example = "1")
     private Integer sort;
 
+    @Schema(description = "状态（1-启用，0-禁用）", example = "1")
+    private Integer status;
+
     @Schema(description = "创建时间")
     private LocalDateTime createTime;
 

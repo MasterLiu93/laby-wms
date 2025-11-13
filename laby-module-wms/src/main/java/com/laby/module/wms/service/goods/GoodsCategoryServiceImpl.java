@@ -20,6 +20,7 @@ import java.util.Map;
 
 import static com.laby.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static com.laby.module.wms.enums.ErrorCodeConstants.GOODS_CATEGORY_NOT_EXISTS;
+import static com.laby.module.wms.enums.ErrorCodeConstants.GOODS_CATEGORY_HAS_ENABLED_CHILDREN;
 
 /**
  * 商品分类 Service 实现类
@@ -109,14 +110,45 @@ public class GoodsCategoryServiceImpl implements GoodsCategoryService {
         // 1. 校验存在
         validateGoodsCategoryExists(updateReqVO.getId());
         
-        // 2. TODO: 校验父分类是否存在
-        // 3. TODO: 校验不能将父分类设置为自己或自己的子分类
+        // 2. 如果更新状态，需要校验子分类状态
+        if (updateReqVO.getStatus() != null) {
+            // 获取当前分类的状态
+            GoodsCategoryDO currentCategory = goodsCategoryMapper.selectById(updateReqVO.getId());
+            if (currentCategory != null && !currentCategory.getStatus().equals(updateReqVO.getStatus())) {
+                // 状态发生了变化，如果是禁用操作，需要校验子分类
+                if (GoodsCategoryDO.STATUS_DISABLE.equals(updateReqVO.getStatus())) {
+                    validateCanDisableCategory(updateReqVO.getId());
+                }
+            }
+        }
         
-        // 4. 更新（编码不可修改）
+        // 3. TODO: 校验父分类是否存在（如果设置了父分类）
+        // 4. TODO: 校验不能将父分类设置为自己或自己的子分类
+        
+        // 5. 更新（编码不可修改）
         GoodsCategoryDO updateObj = GoodsCategoryConvert.INSTANCE.convert(updateReqVO);
         goodsCategoryMapper.updateById(updateObj);
         
         log.info("[updateGoodsCategory] 更新商品分类成功，ID：{}", updateReqVO.getId());
+    }
+
+    @Override
+    public void updateGoodsCategoryStatus(Long id, Integer status) {
+        // 1. 校验分类存在
+        validateGoodsCategoryExists(id);
+        
+        // 2. 如果是禁用操作，需要校验子分类状态
+        if (GoodsCategoryDO.STATUS_DISABLE.equals(status)) { // 禁用操作
+            validateCanDisableCategory(id);
+        }
+        
+        // 3. 更新状态
+        GoodsCategoryDO updateObj = new GoodsCategoryDO();
+        updateObj.setId(id);
+        updateObj.setStatus(status);
+        goodsCategoryMapper.updateById(updateObj);
+        
+        log.info("[updateGoodsCategoryStatus] 更新商品分类状态成功，ID：{}，状态：{}", id, status);
     }
 
     /**
@@ -150,6 +182,57 @@ public class GoodsCategoryServiceImpl implements GoodsCategoryService {
         if (goodsCategoryMapper.selectById(id) == null) {
             throw exception(GOODS_CATEGORY_NOT_EXISTS);
         }
+    }
+
+    /**
+     * 校验是否可以禁用分类（私有方法）
+     * 
+     * 业务规则：禁用父分类前，必须先禁用所有启用状态的子分类（递归检查）
+     *
+     * @param categoryId 要禁用的分类ID
+     * @throws com.laby.framework.common.exception.ServiceException 如果有启用的子分类
+     */
+    private void validateCanDisableCategory(Long categoryId) {
+        // 递归查询所有启用状态的子分类
+        List<GoodsCategoryDO> enabledChildren = findAllEnabledChildren(categoryId);
+        
+        if (CollUtil.isNotEmpty(enabledChildren)) {
+            // 构建子分类名称列表
+            List<String> childNames = enabledChildren.stream()
+                    .map(GoodsCategoryDO::getCategoryName)
+                    .toList();
+            String childNamesStr = String.join("、", childNames);
+            
+            // 抛出业务异常
+            throw exception(GOODS_CATEGORY_HAS_ENABLED_CHILDREN, "请先禁用子分类：" + childNamesStr);
+        }
+    }
+
+    /**
+     * 递归查找所有启用状态的子分类（私有方法）
+     *
+     * @param categoryId 父分类ID
+     * @return 所有启用状态的子分类列表
+     */
+    private List<GoodsCategoryDO> findAllEnabledChildren(Long categoryId) {
+        List<GoodsCategoryDO> allChildren = new java.util.ArrayList<>();
+        
+        // 查询直接子分类
+        List<GoodsCategoryDO> directChildren = goodsCategoryMapper.selectEnabledChildrenByCategoryId(categoryId);
+        
+        if (CollUtil.isNotEmpty(directChildren)) {
+            allChildren.addAll(directChildren);
+            
+            // 递归查询每个子分类的子分类
+            for (GoodsCategoryDO child : directChildren) {
+                List<GoodsCategoryDO> grandChildren = findAllEnabledChildren(child.getId());
+                if (CollUtil.isNotEmpty(grandChildren)) {
+                    allChildren.addAll(grandChildren);
+                }
+            }
+        }
+        
+        return allChildren;
     }
 
     /**
